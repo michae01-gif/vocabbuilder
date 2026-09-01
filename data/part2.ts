@@ -1,0 +1,1048 @@
+import type { RootSeed } from "@/lib/types";
+
+export const part2: RootSeed[] = [
+  {
+    root: "vid / vis",
+    meaning: "to see",
+    language: "Latin",
+    emoji: "🔭",
+    story:
+      "From Latin videre, “to see.” Vision, evidence, and supervision — this family keeps its eyes wide open.",
+    words: [
+      {
+        word: "vision",
+        pos: "noun",
+        definition: "the ability to see; an idea of the future",
+        examples: [
+          "The surgeon's vision returned fully after the operation.",
+          "The founder had a clear vision for the company's future.",
+          "Night vision goggles turn darkness into green light.",
+        ],
+        etymology: "from visio “a seeing”: the act of seeing, or a seeing of what could be.",
+      },
+      {
+        word: "visible",
+        pos: "adjective",
+        definition: "able to be seen",
+        examples: [
+          "The peak is visible from the valley on clear days.",
+          "She made visible progress within a month.",
+          "Microbes are not visible to the naked eye.",
+        ],
+        etymology: "from videre “to see” + -ible: able to be seen.",
+      },
+      {
+        word: "evidence",
+        pos: "noun",
+        definition: "what makes something visible or clear; proof",
+        examples: [
+          "The fingerprints were crucial evidence at the trial.",
+          "There is strong evidence that exercise improves memory.",
+          "She found evidence of the damage in the attic.",
+        ],
+        etymology: "e- “out” + videre “to see”: that which is seen out in the open.",
+      },
+      {
+        word: "provide",
+        pos: "verb",
+        definition: "to see to it that someone gets what is needed",
+        examples: [
+          "The charity provides meals to families in need.",
+          "Parents provide for their children in countless ways.",
+          "This clause provides protection against price rises.",
+        ],
+        etymology: "pro- “before, forward” + videre “to see”: to see ahead and make ready.",
+      },
+      {
+        word: "revise",
+        pos: "verb",
+        definition: "to see again and change",
+        examples: [
+          "The author revised the manuscript three times.",
+          "You should revise your notes before the exam.",
+          "The committee revised its earlier decision.",
+        ],
+        etymology: "re- “again” + videre “to see”: to look again.",
+      },
+      {
+        word: "supervise",
+        pos: "verb",
+        definition: "to oversee; to see that work is done well",
+        examples: [
+          "A senior engineer supervised the young team.",
+          "Teachers supervise the playground at lunch.",
+          "The project was supervised from start to finish.",
+        ],
+        etymology: "super- “over” + videre “to see”: to see over.",
+      },
+      {
+        word: "invisible",
+        pos: "adjective",
+        definition: "not able to be seen",
+        examples: [
+          "The cloak was said to make its wearer invisible.",
+          "Gravity is invisible yet shapes everything.",
+          "Invisible ink appears only under heat.",
+        ],
+        etymology: "in- “not” + visibilis “able to be seen”: unable to be seen.",
+      },
+    ],
+  },
+  {
+    root: "sta / stit",
+    meaning: "to stand",
+    language: "Latin",
+    emoji: "🪨",
+    story:
+      "From Latin stare, “to stand.” Constitutions, statutes, and obstacles all stand firm in this family.",
+    words: [
+      {
+        word: "stable",
+        pos: "adjective",
+        definition: "standing firm; not likely to change or fall",
+        examples: [
+          "The patient's condition is now stable.",
+          "Keep the ladder stable while you climb.",
+          "A stable economy attracts foreign investment.",
+        ],
+        etymology: "from stabilis, from stare “to stand”: able to stand firm.",
+      },
+      {
+        word: "establish",
+        pos: "verb",
+        definition: "to set up so it stands; to found",
+        examples: [
+          "They established the charity in 1999.",
+          "The two nations established formal ties last year.",
+          "Years of service established her reputation.",
+        ],
+        etymology: "e- “out” + stabilire “to make stand”: to make stand firmly.",
+      },
+      {
+        word: "constitute",
+        pos: "verb",
+        definition: "to stand together as; to form or make up",
+        examples: [
+          "Twelve jurors constitute a full jury.",
+          "The move would constitute a breach of the treaty.",
+          "Minorities constitute nearly a third of the city.",
+        ],
+        etymology: "con- “together” + statuere “to set up”: to set up together as one whole.",
+      },
+      {
+        word: "statute",
+        pos: "noun",
+        definition: "a law set down and standing",
+        examples: [
+          "A new statute regulates online privacy.",
+          "The statute has not changed in fifty years.",
+          "Courts interpret the statute on a case-by-case basis.",
+        ],
+        etymology: "from statutum “that which is set up”: a law made to stand.",
+      },
+      {
+        word: "obstacle",
+        pos: "noun",
+        definition: "something standing in the way",
+        examples: [
+          "Funding was the biggest obstacle to the project.",
+          "Runners cleared every obstacle in the course.",
+          "Fear is often the only obstacle to trying.",
+        ],
+        etymology: "ob- “against” + stare “to stand”: something standing against you.",
+      },
+      {
+        word: "constant",
+        pos: "adjective",
+        definition: "standing firm and unchanging",
+        examples: [
+          "The machine runs at a constant speed.",
+          "Her constant support never wavered.",
+          "Keep the temperature constant for best results.",
+        ],
+        etymology: "con- “with” + stare “to stand”: standing with — enduring and steady.",
+      },
+      {
+        word: "substance",
+        pos: "noun",
+        definition: "that which stands under; physical matter; real value",
+        examples: [
+          "The lab tested the unknown substance for toxins.",
+          "The speech was full of sound but lacked substance.",
+          "He argued with substance and calm.",
+        ],
+        etymology: "sub- “under” + stare “to stand”: that which stands underneath everything.",
+      },
+    ],
+  },
+  {
+    root: "ven / vent",
+    meaning: "to come",
+    language: "Latin",
+    emoji: "🚪",
+    story:
+      "From Latin venire, “to come.” Events, inventions, and adventures all arrive through this family.",
+    words: [
+      {
+        word: "convene",
+        pos: "verb",
+        definition: "to come together",
+        examples: [
+          "The board convened at nine sharp.",
+          "Scientists from six countries convened to share findings.",
+          "The committee will convene again in March.",
+        ],
+        etymology: "con- “together” + venire “to come”: to come together.",
+      },
+      {
+        word: "intervene",
+        pos: "verb",
+        definition: "to come between; to step in",
+        examples: [
+          "The referee intervened before the argument escalated.",
+          "The bank intervened to steady the currency.",
+          "Nature intervened and the picnic was cancelled.",
+        ],
+        etymology: "inter- “between” + venire “to come”: to come between.",
+      },
+      {
+        word: "adventure",
+        pos: "noun",
+        definition: "a journey that is about to happen; exciting risk",
+        examples: [
+          "Their trip to the jungle was a true adventure.",
+          "She craved adventure beyond the small town.",
+          "Every page of the book was a new adventure.",
+        ],
+        etymology: "ad- “to” + venturus, from venire “to come”: that which is about to come — a venture.",
+      },
+      {
+        word: "prevent",
+        pos: "verb",
+        definition: "to come before and stop",
+        examples: [
+          "Vaccines prevent diseases before they spread.",
+          "Seatbelts prevent injuries in collisions.",
+          "Nothing can prevent the tide from turning.",
+        ],
+        etymology: "pre- “before” + venire “to come”: to come before, to block.",
+      },
+      {
+        word: "revenue",
+        pos: "noun",
+        definition: "money that comes back in",
+        examples: [
+          "Ticket sales provided most of the theatre's revenue.",
+          "Tax revenue funds public services.",
+          "The company's revenue grew for the tenth straight year.",
+        ],
+        etymology: "re- “back” + venire “to come”: that which comes back.",
+      },
+      {
+        word: "invent",
+        pos: "verb",
+        definition: "to come upon or devise something new",
+        examples: [
+          "Edison did not invent the lightbulb, but he perfected it.",
+          "She invented a clever device to open jars.",
+          "Don't invent excuses for being late.",
+        ],
+        etymology: "in- “upon” + venire “to come”: to come upon — to find or devise.",
+      },
+      {
+        word: "convenient",
+        pos: "adjective",
+        definition: "coming together easily; suited to one's needs",
+        examples: [
+          "The shop's late hours are convenient for commuters.",
+          "A nearby metro station makes the flat very convenient.",
+          "Is three o'clock convenient for you?",
+        ],
+        etymology: "con- “together” + venire “to come”: coming together fitly.",
+      },
+    ],
+  },
+  {
+    root: "mov / mot / mob",
+    meaning: "to move",
+    language: "Latin",
+    emoji: "🏃",
+    story:
+      "From Latin movere, “to move.” Motion, emotion, and momentum all keep this family in motion.",
+    words: [
+      {
+        word: "motion",
+        pos: "noun",
+        definition: "the act of moving; a formal proposal",
+        examples: [
+          "The pendulum's motion was steady and calm.",
+          "A motion to adjourn was passed without debate.",
+          "She set the wheels in motion with a single call.",
+        ],
+        etymology: "from motio “a moving”: the act of moving.",
+      },
+      {
+        word: "motivate",
+        pos: "verb",
+        definition: "to move someone to act",
+        examples: [
+          "Clear goals motivate employees to perform.",
+          "What motivates you to train at dawn?",
+          "The coach's speech motivated the entire team.",
+        ],
+        etymology: "from motivum “a moving cause”: to give someone a reason to move.",
+      },
+      {
+        word: "emotion",
+        pos: "noun",
+        definition: "a strong feeling that moves the mind",
+        examples: [
+          "The film stirred every emotion in the audience.",
+          "She struggled to hide her emotion during the farewell.",
+          "Emotions can move us to act without thinking.",
+        ],
+        etymology: "e- “out” + movere “to move”: that which moves out of us.",
+      },
+      {
+        word: "promote",
+        pos: "verb",
+        definition: "to move forward or upward",
+        examples: [
+          "The company promoted her to regional manager.",
+          "They promote the new album with short videos.",
+          "Good sleep promotes better concentration.",
+        ],
+        etymology: "pro- “forward” + movere “to move”: to move forward.",
+      },
+      {
+        word: "remote",
+        pos: "adjective",
+        definition: "moved far away; distant",
+        examples: [
+          "They lived in a remote valley hours from the city.",
+          "She works remotely from a cabin in the woods.",
+          "The possibility of failure seemed remote.",
+        ],
+        etymology: "re- “back” + movere “to move”: moved far back — distant.",
+      },
+      {
+        word: "momentum",
+        pos: "noun",
+        definition: "the force of moving mass; growing drive",
+        examples: [
+          "The snowball gained momentum as it rolled downhill.",
+          "Her campaign built momentum through the summer.",
+          "Keep the momentum going and finish the task.",
+        ],
+        etymology: "from momentum “movement, force”: the power of things in motion.",
+      },
+      {
+        word: "mobile",
+        pos: "adjective",
+        definition: "able to move freely",
+        examples: [
+          "A mobile clinic visits the villages each month.",
+          "Her mobile phone is always within reach.",
+          "The soldiers kept their forces highly mobile.",
+        ],
+        etymology: "from mobilis, from movere “to move”: able to be moved.",
+      },
+      {
+        word: "motif",
+        pos: "noun",
+        definition: "a repeated moving theme or design",
+        examples: [
+          "The butterfly motif appears throughout the novel.",
+          "The carpet's geometric motif echoes the architecture.",
+          "A recurring motif in his music is the falling note.",
+        ],
+        etymology: "from motif (French), from movere “to move”: a theme that keeps moving through a work.",
+      },
+    ],
+  },
+  {
+    root: "scrib / script",
+    meaning: "to write",
+    language: "Latin",
+    emoji: "✍️",
+    story:
+      "From Latin scribere, “to write.” Scripts, subscriptions, and inscriptions all put ink to paper in this family.",
+    words: [
+      {
+        word: "describe",
+        pos: "verb",
+        definition: "to write or say what something is like",
+        examples: [
+          "The witness described the scene in precise detail.",
+          "Words alone cannot describe the view from the summit.",
+          "She described the symptoms to the doctor.",
+        ],
+        etymology: "de- “down” + scribere “to write”: to write down fully.",
+      },
+      {
+        word: "prescribe",
+        pos: "verb",
+        definition: "to write out instructions, especially medical orders",
+        examples: [
+          "The doctor prescribed a week of antibiotics.",
+          "The law prescribes a fine for the offence.",
+          "Follow the route the map prescribes.",
+        ],
+        etymology: "pre- “before” + scribere “to write”: to write before — to set down in advance.",
+      },
+      {
+        word: "subscribe",
+        pos: "verb",
+        definition: "to write one's name under an agreement",
+        examples: [
+          "I subscribe to two magazines and a newsletter.",
+          "He subscribes to the belief that habits shape destiny.",
+          "Thousands subscribed to the streaming service.",
+        ],
+        etymology: "sub- “under” + scribere “to write”: to write underneath — to sign up.",
+      },
+      {
+        word: "manuscript",
+        pos: "noun",
+        definition: "a text written by hand or as an original draft",
+        examples: [
+          "The monk's manuscript is preserved in the abbey library.",
+          "She sent her manuscript to twelve publishers.",
+          "The ancient manuscript is written in gold ink.",
+        ],
+        etymology: "manu- “by hand” + scriptum “something written”: written by hand.",
+      },
+      {
+        word: "transcript",
+        pos: "noun",
+        definition: "a written copy of spoken or recorded words",
+        examples: [
+          "The court ordered a transcript of the interview.",
+          "Her university transcript shows excellent grades.",
+          "Podcasts publish a transcript alongside the audio.",
+        ],
+        etymology: "trans- “across” + scriptum “something written”: a writing copied across.",
+      },
+      {
+        word: "inscription",
+        pos: "noun",
+        definition: "words written into a surface or book",
+        examples: [
+          "The monument's inscription names the fallen soldiers.",
+          "She added a warm inscription to the gift.",
+          "The ring bore an inscription in an unknown script.",
+        ],
+        etymology: "in- “in” + scribere “to write”: writing cut into something.",
+      },
+      {
+        word: "scripture",
+        pos: "noun",
+        definition: "sacred writings",
+        examples: [
+          "The scholar compared passages across the scriptures.",
+          "He quoted scripture during his address.",
+          "Ancient scriptures describe a lost flood.",
+        ],
+        etymology: "from scriptura “a writing”: holy writings.",
+      },
+    ],
+  },
+  {
+    root: "fer",
+    meaning: "to carry, bring",
+    language: "Latin",
+    emoji: "🎒",
+    story:
+      "From Latin ferre, “to carry or bring.” Transfer, defer, and infer all carry meaning across distances.",
+    words: [
+      {
+        word: "transfer",
+        pos: "verb / noun",
+        definition: "to carry from one place to another",
+        examples: [
+          "She transferred the funds to a new account.",
+          "He was transferred to the Paris office.",
+          "The data transfer took only seconds.",
+        ],
+        etymology: "trans- “across” + ferre “to carry”: to carry across.",
+      },
+      {
+        word: "refer",
+        pos: "verb",
+        definition: "to carry attention back to something",
+        examples: [
+          "The report refers to earlier studies.",
+          "Please refer to the manual for details.",
+          "She referred him to a specialist.",
+        ],
+        etymology: "re- “back” + ferre “to carry”: to carry back to a source.",
+      },
+      {
+        word: "infer",
+        pos: "verb",
+        definition: "to carry meaning into a conclusion",
+        examples: [
+          "From his tone, I inferred that he was annoyed.",
+          "You can infer the climate from the vegetation.",
+          "What do you infer from these clues?",
+        ],
+        etymology: "in- “in” + ferre “to carry”: to carry in a meaning from clues.",
+      },
+      {
+        word: "confer",
+        pos: "verb",
+        definition: "to bring together to discuss; to grant",
+        examples: [
+          "The two leaders conferred privately for an hour.",
+          "The degree confers the right to practice medicine.",
+          "Let's confer before making the final choice.",
+        ],
+        etymology: "con- “together” + ferre “to carry”: to carry ideas together.",
+      },
+      {
+        word: "defer",
+        pos: "verb",
+        definition: "to carry off to a later time; to yield to another",
+        examples: [
+          "They deferred the decision until next month.",
+          "I defer to your expertise on this matter.",
+          "Student loan payments can be deferred.",
+        ],
+        etymology: "de- “down, away” + ferre “to carry”: to carry away to later, or carry oneself down before another.",
+      },
+      {
+        word: "fertile",
+        pos: "adjective",
+        definition: "able to carry much growth",
+        examples: [
+          "The valley's soil is dark and fertile.",
+          "Her imagination is fertile with ideas.",
+          "A fertile mind asks questions constantly.",
+        ],
+        etymology: "from fertilis, from ferre “to carry”: able to bear and bring forth.",
+      },
+      {
+        word: "differ",
+        pos: "verb",
+        definition: "to carry apart; to be unlike",
+        examples: [
+          "The twins differ in temperament and taste.",
+          "I differ with you on that point.",
+          "Opinions differ about the best approach.",
+        ],
+        etymology: "dis- “apart” + ferre “to carry”: to carry apart — to be different.",
+      },
+    ],
+  },
+  {
+    root: "grad / gress",
+    meaning: "to step, go",
+    language: "Latin",
+    emoji: "🪜",
+    story:
+      "From Latin gradi, “to step.” Progress, graduates, and congresses all take steps in this family.",
+    words: [
+      {
+        word: "progress",
+        pos: "noun / verb",
+        definition: "a stepping forward; improvement",
+        examples: [
+          "The students made steady progress all term.",
+          "Work is progressing faster than expected.",
+          "Progress rarely happens without setbacks.",
+        ],
+        etymology: "pro- “forward” + gradi “to step”: to step forward.",
+      },
+      {
+        word: "graduate",
+        pos: "verb / noun",
+        definition: "to step up in rank or complete a course",
+        examples: [
+          "She graduated with honors in biology.",
+          "The thermometer graduated from zero to one hundred.",
+          "Each graduate received a certificate.",
+        ],
+        etymology: "gradus “a step” + -ate: to take the step to the next stage.",
+      },
+      {
+        word: "gradual",
+        pos: "adjective",
+        definition: "taking place step by step",
+        examples: [
+          "There has been a gradual rise in temperatures.",
+          "Recovery was gradual but sure.",
+          "The transition to daylight saving is gradual.",
+        ],
+        etymology: "from gradus “a step”: by degrees, step by step.",
+      },
+      {
+        word: "aggressive",
+        pos: "adjective",
+        definition: "stepping toward others forcefully",
+        examples: [
+          "The aggressive driver cut across three lanes.",
+          "An aggressive sales pitch can repel customers.",
+          "Cancer cells can grow aggressively.",
+        ],
+        etymology: "ag- “toward” + gradi “to step”: stepping toward — attacking.",
+      },
+      {
+        word: "congress",
+        pos: "noun",
+        definition: "a stepping together; a legislative body",
+        examples: [
+          "Congress debated the bill through the night.",
+          "Delegates flew in for the international congress.",
+          "The union held its annual congress in May.",
+        ],
+        etymology: "con- “together” + gradi “to step”: a stepping together of representatives.",
+      },
+      {
+        word: "degrade",
+        pos: "verb",
+        definition: "to step down in rank or quality",
+        examples: [
+          "Littering degrades the beauty of the park.",
+          "The officer was degraded for misconduct.",
+          "Plastic does not degrade quickly in the ocean.",
+        ],
+        etymology: "de- “down” + gradi “to step”: to step down.",
+      },
+      {
+        word: "digress",
+        pos: "verb",
+        definition: "to step aside from the main topic",
+        examples: [
+          "The lecturer digressed into a story about his cat.",
+          "Let's not digress from the agenda.",
+          "She digressed briefly, then returned to the point.",
+        ],
+        etymology: "di- “apart” + gradi “to step”: to step away from the subject.",
+      },
+    ],
+  },
+  {
+    root: "ten / tend / tens",
+    meaning: "to stretch",
+    language: "Latin",
+    emoji: "🪢",
+    story:
+      "From Latin tendere, “to stretch.” Tendons stretch, intentions reach forward, and tension pulls tight.",
+    words: [
+      {
+        word: "extend",
+        pos: "verb",
+        definition: "to stretch out further",
+        examples: [
+          "They extended the deadline by a week.",
+          "The field extends to the river.",
+          "She extended a hand in welcome.",
+        ],
+        etymology: "ex- “out” + tendere “to stretch”: to stretch out.",
+      },
+      {
+        word: "intend",
+        pos: "verb",
+        definition: "to stretch one's aim toward something",
+        examples: [
+          "I intend to finish the course this year.",
+          "The gift was intended for your birthday.",
+          "She intended no harm by her remark.",
+        ],
+        etymology: "in- “toward” + tendere “to stretch”: to stretch toward a goal.",
+      },
+      {
+        word: "tension",
+        pos: "noun",
+        definition: "the state of being stretched tight; strain",
+        examples: [
+          "The rope held under heavy tension.",
+          "There was visible tension between the rivals.",
+          "Music can ease the tension of a long day.",
+        ],
+        etymology: "from tensio “a stretching”: tightness.",
+      },
+      {
+        word: "tendency",
+        pos: "noun",
+        definition: "a stretch in a particular direction; a leaning",
+        examples: [
+          "He has a tendency to interrupt.",
+          "There is a growing tendency to work from home.",
+          "Markets show a tendency to overreact.",
+        ],
+        etymology: "from tendere “to stretch”: a stretching toward a habit.",
+      },
+      {
+        word: "attend",
+        pos: "verb",
+        definition: "to stretch one's attention toward",
+        examples: [
+          "She attends every lecture on marine biology.",
+          "Please attend to the customer at the counter.",
+          "He attended the meeting remotely.",
+        ],
+        etymology: "ad- “to” + tendere “to stretch”: to stretch one's mind toward.",
+      },
+      {
+        word: "contend",
+        pos: "verb",
+        definition: "to stretch against; to compete or argue",
+        examples: [
+          "Two strong teams contend for the title.",
+          "He contends that the policy is unfair.",
+          "The climbers contended with fierce winds.",
+        ],
+        etymology: "con- “with, together” + tendere “to stretch”: to stretch against another.",
+      },
+      {
+        word: "pretentious",
+        pos: "adjective",
+        definition: "stretched beyond what is true; showing off",
+        examples: [
+          "The pretentious speech impressed no one.",
+          "Avoid pretentious words when simple ones work.",
+          "She found his titled friends rather pretentious.",
+        ],
+        etymology: "pre- “before” + tendere “to stretch”: stretched out beyond reality.",
+      },
+    ],
+  },
+  {
+    root: "leg / lect / lig",
+    meaning: "to choose, read",
+    language: "Latin",
+    emoji: "📚",
+    story:
+      "From Latin legere, “to choose and to read.” To read is to gather meaning; to choose is to gather the best.",
+    words: [
+      {
+        word: "select",
+        pos: "verb",
+        definition: "to choose from many",
+        examples: [
+          "The committee selected three finalists.",
+          "Select the file you wish to upload.",
+          "She was selected for the national team.",
+        ],
+        etymology: "se- “apart” + legere “to choose”: to choose apart from the rest.",
+      },
+      {
+        word: "collect",
+        pos: "verb",
+        definition: "to gather together",
+        examples: [
+          "He collects vintage postcards from around the world.",
+          "The charity collects donations each winter.",
+          "A crowd collected around the street musician.",
+        ],
+        etymology: "con- “together” + legere “to gather”: to gather together.",
+      },
+      {
+        word: "legend",
+        pos: "noun",
+        definition: "a story to be read; a famous person",
+        examples: [
+          "The legend of the lake monster has lasted centuries.",
+          "She is a legend of the film world.",
+          "The map's legend explains every symbol.",
+        ],
+        etymology: "from legenda “things to be read”: a story meant to be read.",
+      },
+      {
+        word: "eligible",
+        pos: "adjective",
+        definition: "able to be chosen",
+        examples: [
+          "Only citizens over eighteen are eligible to vote.",
+          "She is eligible for a scholarship.",
+          "The team is eligible for the playoffs.",
+        ],
+        etymology: "e- “out” + legere “to choose” + -ible: able to be chosen out.",
+      },
+      {
+        word: "elegant",
+        pos: "adjective",
+        definition: "chosen with taste; refined",
+        examples: [
+          "Her elegant gown drew admiring glances.",
+          "The solution was elegant in its simplicity.",
+          "He wrote in an elegant, measured style.",
+        ],
+        etymology: "from eligere “to choose out”: chosen with care and taste.",
+      },
+      {
+        word: "intellect",
+        pos: "noun",
+        definition: "the power to gather and understand knowledge",
+        examples: [
+          "Her intellect matched her kindness.",
+          "The debate tested every speaker's intellect.",
+          "Reading exercises the intellect.",
+        ],
+        etymology: "intel- “between” + legere “to choose/read”: the mind that reads between.",
+      },
+      {
+        word: "diligent",
+        pos: "adjective",
+        definition: "choosing to work steadily and carefully",
+        examples: [
+          "The diligent student reviewed every chapter.",
+          "A diligent search turned up the missing keys.",
+          "Diligent practice built his skill.",
+        ],
+        etymology: "from diligere “to love, value, choose”: one who values and works at the task.",
+      },
+    ],
+  },
+  {
+    root: "sequ / secut",
+    meaning: "to follow",
+    language: "Latin",
+    emoji: "🔗",
+    story:
+      "From Latin sequi, “to follow.” Sequences, consequences, and pursuers all follow in this family's footsteps.",
+    words: [
+      {
+        word: "sequence",
+        pos: "noun",
+        definition: "a following order of things",
+        examples: [
+          "The sequence of events is recorded in the log.",
+          "She memorized the dance sequence in one evening.",
+          "Follow the sequence of steps in the manual.",
+        ],
+        etymology: "from sequi “to follow”: things that follow one another.",
+      },
+      {
+        word: "consequence",
+        pos: "noun",
+        definition: "that which follows from an action",
+        examples: [
+          "Every choice has a consequence.",
+          "As a consequence of the storm, flights were cancelled.",
+          "He faced the consequences of his decision.",
+        ],
+        etymology: "con- “with” + sequi “to follow”: that which follows along.",
+      },
+      {
+        word: "subsequent",
+        pos: "adjective",
+        definition: "following after",
+        examples: [
+          "Subsequent studies confirmed the first result.",
+          "The error had no subsequent impact.",
+          "She moved to Rome and subsequent to that, to Paris.",
+        ],
+        etymology: "sub- “under, after” + sequi “to follow”: following after.",
+      },
+      {
+        word: "pursue",
+        pos: "verb",
+        definition: "to follow after with intent",
+        examples: [
+          "She pursued a career in marine biology.",
+          "The police pursued the car through the streets.",
+          "He pursued his dream despite the odds.",
+        ],
+        etymology: "from prosequi “to follow forward”: to follow on toward.",
+      },
+      {
+        word: "execute",
+        pos: "verb",
+        definition: "to follow through with a task",
+        examples: [
+          "The team executed the plan flawlessly.",
+          "The court ordered the will to be executed.",
+          "She executed a perfect backflip.",
+        ],
+        etymology: "ex- “out” + sequi “to follow”: to follow a plan all the way out.",
+      },
+      {
+        word: "consecutive",
+        pos: "adjective",
+        definition: "following without a break",
+        examples: [
+          "She won the title three consecutive years.",
+          "It rained for five consecutive days.",
+          "The team scored in seven consecutive matches.",
+        ],
+        etymology: "con- “with” + sequi “to follow”: following one after another.",
+      },
+      {
+        word: "sequel",
+        pos: "noun",
+        definition: "a story that follows an earlier one",
+        examples: [
+          "The sequel outgrossed the original film.",
+          "Fans waited years for the sequel.",
+          "The war was a tragic sequel to the treaty.",
+        ],
+        etymology: "from sequi “to follow”: that which follows.",
+      },
+    ],
+  },
+  {
+    root: "fac / fact / fect",
+    meaning: "to make, do",
+    language: "Latin",
+    emoji: "🛠️",
+    story:
+      "From Latin facere, “to make or do.” Factories make things; facts are made by evidence; effects are made by causes.",
+    words: [
+      {
+        word: "factory",
+        pos: "noun",
+        definition: "a place where things are made",
+        examples: [
+          "The factory produces ten thousand shoes a day.",
+          "She toured the chocolate factory's new wing.",
+          "The old factory was converted into lofts.",
+        ],
+        etymology: "from factura “a making”: a place of making.",
+      },
+      {
+        word: "effect",
+        pos: "noun",
+        definition: "a change brought about; a result",
+        examples: [
+          "The medicine had an immediate effect.",
+          "Light has a strong effect on mood.",
+          "The new rule took effect in January.",
+        ],
+        etymology: "e- “out” + facere “to make”: that which is made out of a cause.",
+      },
+      {
+        word: "perfect",
+        pos: "adjective / verb",
+        definition: "made completely; without flaw",
+        examples: [
+          "The weather was perfect for sailing.",
+          "She spent years perfecting her craft.",
+          "Practice makes the movement perfect.",
+        ],
+        etymology: "per- “completely” + facere “to make”: made completely.",
+      },
+      {
+        word: "affect",
+        pos: "verb",
+        definition: "to act upon; to change",
+        examples: [
+          "The news affected everyone in the office.",
+          "Altitude affects the boiling point of water.",
+          "Her mood was not affected by the delay.",
+        ],
+        etymology: "ad- “to” + facere “to do”: to do something to.",
+      },
+      {
+        word: "benefit",
+        pos: "noun / verb",
+        definition: "a good thing made; advantage",
+        examples: [
+          "Regular exercise has many health benefits.",
+          "The change benefits everyone equally.",
+          "She spoke at the benefit for local schools.",
+        ],
+        etymology: "bene- “well” + facere “to do”: a well-done thing, an advantage.",
+      },
+      {
+        word: "defect",
+        pos: "noun",
+        definition: "a flaw in what was made",
+        examples: [
+          "The inspector found a defect in the weld.",
+          "The car was recalled over a brake defect.",
+          "Every product has minor defects.",
+        ],
+        etymology: "de- “away, down” + facere “to make”: something made imperfectly.",
+      },
+      {
+        word: "facilitate",
+        pos: "verb",
+        definition: "to make something easier",
+        examples: [
+          "Ramps facilitate access for wheelchairs.",
+          "The software facilitates teamwork across offices.",
+          "A good teacher facilitates learning rather than forcing it.",
+        ],
+        etymology: "from facilis “easy,” from facere “to make”: to make easy.",
+      },
+    ],
+  },
+  {
+    root: "ped",
+    meaning: "foot",
+    language: "Latin",
+    emoji: "👣",
+    story:
+      "From Latin pes, pedis, “foot.” Pedestrians walk, pedals are pushed by feet, and expeditions march on foot.",
+    words: [
+      {
+        word: "pedestrian",
+        pos: "noun / adjective",
+        definition: "a person walking; ordinary or dull",
+        examples: [
+          "The crossing gives pedestrians a safe route.",
+          "Pedestrian zones fill with shoppers on weekends.",
+          "The report was thorough but pedestrian.",
+        ],
+        etymology: "from pedester “going on foot”: one who walks.",
+      },
+      {
+        word: "pedal",
+        pos: "noun / verb",
+        definition: "a lever pushed by the foot; to ride by pedaling",
+        examples: [
+          "She pressed the brake pedal gently.",
+          "He pedaled hard up the final hill.",
+          "The piano's pedals change the sound.",
+        ],
+        etymology: "from pes, pedis “foot”: worked by the foot.",
+      },
+      {
+        word: "expedition",
+        pos: "noun",
+        definition: "a journey made by a group with a purpose",
+        examples: [
+          "The expedition to the South Pole took four months.",
+          "They organized an expedition to map the cave system.",
+          "A rescue expedition set out at dawn.",
+        ],
+        etymology: "ex- “out” + pes, pedis “foot” + -tion: a marching forth.",
+      },
+      {
+        word: "impediment",
+        pos: "noun",
+        definition: "something that entangles the feet; a hindrance",
+        examples: [
+          "Lack of funding is an impediment to research.",
+          "He spoke with a slight impediment.",
+          "Heavy snow was an impediment to travel.",
+        ],
+        etymology: "im- “in” + pedis “foot”: something caught in the feet.",
+      },
+      {
+        word: "centipede",
+        pos: "noun",
+        definition: "a creature with many legs",
+        examples: [
+          "A centipede scurried across the forest floor.",
+          "Despite the name, most centipedes have far fewer than a hundred legs.",
+          "The centipede's bite is venomous to insects.",
+        ],
+        etymology: "centi- “hundred” + pes, pedis “foot”: the hundred-footed creature.",
+      },
+      {
+        word: "pedigree",
+        pos: "noun",
+        definition: "a record of descent, traced through a family line",
+        examples: [
+          "The dog's pedigree was documented for five generations.",
+          "Her family has an impressive musical pedigree.",
+          "Judges checked the horse's pedigree before the race.",
+        ],
+        etymology: "from Old French pie de grue “crane's foot,” a mark shaped like a foot used in family trees.",
+      },
+    ],
+  },
+];
