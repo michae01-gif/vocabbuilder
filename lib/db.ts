@@ -1,9 +1,13 @@
 import Database from "better-sqlite3";
 import path from "path";
+import os from "os";
 import fs from "fs";
 
-const DB_DIR = process.env.RAILWAY_VOLUME_MOUNT_PATH
-  || (process.env.DATABASE_PATH ? path.dirname(process.env.DATABASE_PATH) : path.join(process.cwd(), "data"));
+const isBuildPhase = process.env.NEXT_PHASE === "phase-production-build";
+const DB_DIR = isBuildPhase
+  ? path.join(fs.mkdtempSync(path.join(os.tmpdir(), "wordforge-build-")))
+  : process.env.RAILWAY_VOLUME_MOUNT_PATH
+    || (process.env.DATABASE_PATH ? path.dirname(process.env.DATABASE_PATH) : path.join(process.cwd(), "data"));
 const DB_FILE = process.env.DATABASE_PATH ?? path.join(DB_DIR, "wordforge.db");
 
 fs.mkdirSync(DB_DIR, { recursive: true });
@@ -166,63 +170,72 @@ export function initSchema() {
   migrateUsers();
 }
 
+function tryAlter(sql: string) {
+  try {
+    db.prepare(sql).run();
+  } catch (e) {
+    if (!(e instanceof Error && e.message.includes("duplicate column name"))) throw e;
+  }
+}
+
 function migrateProgress() {
   const cols = db.prepare("PRAGMA table_info(progress)").all() as { name: string }[];
   const has = (name: string) => cols.some((c) => c.name === name);
-  if (!has("stage")) db.prepare("ALTER TABLE progress ADD COLUMN stage TEXT NOT NULL DEFAULT 'recognised'").run();
+  if (!has("stage")) tryAlter("ALTER TABLE progress ADD COLUMN stage TEXT NOT NULL DEFAULT 'recognised'");
   if (!has("productive_successes"))
-    db.prepare("ALTER TABLE progress ADD COLUMN productive_successes INTEGER NOT NULL DEFAULT 0").run();
+    tryAlter("ALTER TABLE progress ADD COLUMN productive_successes INTEGER NOT NULL DEFAULT 0");
   if (!has("receptive_successes"))
-    db.prepare("ALTER TABLE progress ADD COLUMN receptive_successes INTEGER NOT NULL DEFAULT 0").run();
+    tryAlter("ALTER TABLE progress ADD COLUMN receptive_successes INTEGER NOT NULL DEFAULT 0");
   if (!has("discrimination_successes"))
-    db.prepare("ALTER TABLE progress ADD COLUMN discrimination_successes INTEGER NOT NULL DEFAULT 0").run();
+    tryAlter("ALTER TABLE progress ADD COLUMN discrimination_successes INTEGER NOT NULL DEFAULT 0");
   if (!has("transfer_successes"))
-    db.prepare("ALTER TABLE progress ADD COLUMN transfer_successes INTEGER NOT NULL DEFAULT 0").run();
+    tryAlter("ALTER TABLE progress ADD COLUMN transfer_successes INTEGER NOT NULL DEFAULT 0");
   if (!has("production_passes"))
-    db.prepare("ALTER TABLE progress ADD COLUMN production_passes INTEGER NOT NULL DEFAULT 0").run();
+    tryAlter("ALTER TABLE progress ADD COLUMN production_passes INTEGER NOT NULL DEFAULT 0");
   if (!has("critical_error_open"))
-    db.prepare("ALTER TABLE progress ADD COLUMN critical_error_open INTEGER NOT NULL DEFAULT 0").run();
+    tryAlter("ALTER TABLE progress ADD COLUMN critical_error_open INTEGER NOT NULL DEFAULT 0");
   if (!has("first_productive_at"))
-    db.prepare("ALTER TABLE progress ADD COLUMN first_productive_at TEXT").run();
+    tryAlter("ALTER TABLE progress ADD COLUMN first_productive_at TEXT");
   if (!has("last_productive_at"))
-    db.prepare("ALTER TABLE progress ADD COLUMN last_productive_at TEXT").run();
-  if (!has("mastered_at")) db.prepare("ALTER TABLE progress ADD COLUMN mastered_at TEXT").run();
-  if (!has("lapsed_at")) db.prepare("ALTER TABLE progress ADD COLUMN lapsed_at TEXT").run();
+    tryAlter("ALTER TABLE progress ADD COLUMN last_productive_at TEXT");
+  if (!has("mastered_at")) tryAlter("ALTER TABLE progress ADD COLUMN mastered_at TEXT");
+  if (!has("lapsed_at")) tryAlter("ALTER TABLE progress ADD COLUMN lapsed_at TEXT");
 
   const rcols = db.prepare("PRAGMA table_info(review_logs)").all() as { name: string }[];
   if (!rcols.some((c) => c.name === "task_type"))
-    db.prepare("ALTER TABLE review_logs ADD COLUMN task_type TEXT NOT NULL DEFAULT 'receptive'").run();
+    tryAlter("ALTER TABLE review_logs ADD COLUMN task_type TEXT NOT NULL DEFAULT 'receptive'");
 }
 
 function migrateUsers() {
   const cols = db.prepare("PRAGMA table_info(users)").all() as { name: string }[];
-  if (!cols.some((c) => c.name === "reading_level")) {
-    db.prepare("ALTER TABLE users ADD COLUMN reading_level INTEGER NOT NULL DEFAULT 1").run();
+  const has = (name: string) => cols.some((c) => c.name === name);
+  if (!has("reading_level")) {
+    tryAlter("ALTER TABLE users ADD COLUMN reading_level INTEGER NOT NULL DEFAULT 1");
   }
-  if (!cols.some((c) => c.name === "coins")) {
-    db.prepare("ALTER TABLE users ADD COLUMN coins INTEGER NOT NULL DEFAULT 0").run();
+  if (!has("coins")) {
+    tryAlter("ALTER TABLE users ADD COLUMN coins INTEGER NOT NULL DEFAULT 0");
     db.prepare("UPDATE users SET coins = 100").run();
   }
-  if (!cols.some((c) => c.name === "last_spin_date")) {
-    db.prepare("ALTER TABLE users ADD COLUMN last_spin_date TEXT").run();
+  if (!has("last_spin_date")) {
+    tryAlter("ALTER TABLE users ADD COLUMN last_spin_date TEXT");
   }
-  if (!cols.some((c) => c.name === "avatar")) {
-    db.prepare("ALTER TABLE users ADD COLUMN avatar TEXT NOT NULL DEFAULT '🦉'").run();
+  if (!has("avatar")) {
+    tryAlter("ALTER TABLE users ADD COLUMN avatar TEXT NOT NULL DEFAULT '🦉'");
   }
-  if (!cols.some((c) => c.name === "title")) {
-    db.prepare("ALTER TABLE users ADD COLUMN title TEXT NOT NULL DEFAULT 'Novice'").run();
+  if (!has("title")) {
+    tryAlter("ALTER TABLE users ADD COLUMN title TEXT NOT NULL DEFAULT 'Novice'");
   }
-  if (!cols.some((c) => c.name === "banner")) {
-    db.prepare("ALTER TABLE users ADD COLUMN banner TEXT NOT NULL DEFAULT 'banner-amber'").run();
+  if (!has("banner")) {
+    tryAlter("ALTER TABLE users ADD COLUMN banner TEXT NOT NULL DEFAULT 'banner-amber'");
   }
-  if (!cols.some((c) => c.name === "frame")) {
-    db.prepare("ALTER TABLE users ADD COLUMN frame TEXT NOT NULL DEFAULT 'frame-classic'").run();
+  if (!has("frame")) {
+    tryAlter("ALTER TABLE users ADD COLUMN frame TEXT NOT NULL DEFAULT 'frame-classic'");
   }
-  if (!cols.some((c) => c.name === "name_style")) {
-    db.prepare("ALTER TABLE users ADD COLUMN name_style TEXT NOT NULL DEFAULT 'name-classic'").run();
+  if (!has("name_style")) {
+    tryAlter("ALTER TABLE users ADD COLUMN name_style TEXT NOT NULL DEFAULT 'name-classic'");
   }
-  if (!cols.some((c) => c.name === "background")) {
-    db.prepare("ALTER TABLE users ADD COLUMN background TEXT NOT NULL DEFAULT 'bg-forge'").run();
+  if (!has("background")) {
+    tryAlter("ALTER TABLE users ADD COLUMN background TEXT NOT NULL DEFAULT 'bg-forge'");
   }
 }
 
