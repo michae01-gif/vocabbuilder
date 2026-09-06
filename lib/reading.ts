@@ -239,12 +239,12 @@ export function checkpointQuizDb(userId: number): CheckpointQuestion[] {
   const db = getDb();
   const ph = ids.map(() => "?").join(",");
   const words = db
-    .prepare(`SELECT id, word, definition FROM words WHERE id IN (${ph}) ORDER BY difficulty DESC, word`)
+    .prepare(`SELECT id, word, definition FROM words WHERE id IN (${ph}) AND definition <> '' ORDER BY difficulty DESC, word`)
     .all(...ids) as { id: number; word: string; definition: string }[];
   if (words.length === 0) return [];
 
   const distract = db
-    .prepare(`SELECT DISTINCT definition FROM words WHERE id NOT IN (${ph}) ORDER BY RANDOM() LIMIT ?`)
+    .prepare(`SELECT DISTINCT definition FROM words WHERE id NOT IN (${ph}) AND definition <> '' ORDER BY RANDOM() LIMIT ?`)
     .all(...ids, words.length * 6) as { definition: string }[];
   const pool = distract.map((d) => d.definition);
 

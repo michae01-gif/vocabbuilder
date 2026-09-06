@@ -21,7 +21,7 @@ function seedAllRoots(db: ReturnType<typeof getDb>) {
   );
   const insertWord = db.prepare(
     `INSERT OR IGNORE INTO words (root_id, word, pos, definition, pronunciation, example1, example2, example3, etymology, difficulty, frequency)
-     VALUES (?, ?, ?, '', ?, ?, ?, ?, ?, ?, ?)`
+     VALUES (?, ?, ?, ?, '', ?, ?, ?, ?, ?, ?)`
   );
 
   const tx = db.transaction(() => {
@@ -57,7 +57,7 @@ function seedMissingRoots(db: ReturnType<typeof getDb>, existingCount: number) {
   );
   const insertWord = db.prepare(
     `INSERT OR IGNORE INTO words (root_id, word, pos, definition, pronunciation, example1, example2, example3, etymology, difficulty, frequency)
-     VALUES (?, ?, ?, '', ?, ?, ?, ?, ?, ?, ?)`
+     VALUES (?, ?, ?, ?, '', ?, ?, ?, ?, ?, ?)`
   );
 
   let newCount = 0;

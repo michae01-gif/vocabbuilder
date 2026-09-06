@@ -182,6 +182,18 @@ export function initSchema() {
 
   migrateProgress();
   migrateUsers();
+  repairWordDefinitions();
+}
+
+function repairWordDefinitions() {
+  const n = (
+    db
+      .prepare("SELECT COUNT(*) AS n FROM words WHERE definition = '' AND pronunciation <> ''")
+      .get() as { n: number }
+  ).n;
+  if (n > 0) {
+    db.prepare("UPDATE words SET definition = pronunciation, pronunciation = '' WHERE definition = '' AND pronunciation <> ''").run();
+  }
 }
 
 function tryAlter(sql: string) {
