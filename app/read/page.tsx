@@ -6,14 +6,25 @@ import {
   distractorPool,
   getReadingState,
   passageById,
+  getSkipCheckpointDb,
+  checkpointQuizDb,
 } from "@/lib/reading";
 import ReadingRunner from "@/components/reading-runner";
+import SkipCheckpoint from "@/components/skip-checkpoint";
 
 export const dynamic = "force-dynamic";
 
 export default function ReadPage() {
   const user = getOrCreateUser();
   const level = user.reading_level ?? 1;
+
+  const checkpoint = getSkipCheckpointDb(user.id);
+  if (checkpoint) {
+    const quiz = checkpointQuizDb(user.id);
+    if (quiz.length > 0) {
+      return <SkipCheckpoint questions={quiz} level={level} />;
+    }
+  }
 
   const saved = getReadingState(user.id);
   const savedPassage = saved ? passageById(saved.passageId) : undefined;

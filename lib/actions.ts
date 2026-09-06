@@ -7,8 +7,20 @@ import { RATINGS, review, scheduleNew, type RatingValue } from "./srs";
 import { computeStage } from "./stage";
 import { evaluateSentence } from "./evaluate";
 import { MAX_READING_TIER } from "@/data/passages";
-import { saveReadingStateDb, clearReadingStateDb, type ReadingStateInput } from "./reading";
-import { spinWheelDb, claimQuestDb, buyItemDb, equipItemDb, incrementQuest, claimRootDb, awardPassageCoinsDb, PASSAGE_COMPLETION_REWARD, type QuestType } from "./rewards";
+import {
+  saveReadingStateDb,
+  clearReadingStateDb,
+  passageById,
+  passageMatches,
+  logSkipDb,
+  buildSkipCheckpointDb,
+  completeSkipCheckpointDb,
+  getSkipCheckpointDb,
+  pendingSkipCountDb,
+  SKIPS_PER_CHECKPOINT,
+  type ReadingStateInput,
+} from "./reading";
+import { spinWheelDb, claimQuestDb, buyItemDb, equipItemDb, incrementQuest, claimRootDb, awardPassageCoinsDb, awardSkipCheckpointCoinsDb, PASSAGE_COMPLETION_REWARD, type QuestType } from "./rewards";
 import { registerUsername as registerUsernameDb, updateLeaderboardScore } from "./leaderboard";
 
 const db = getDb();
@@ -283,18 +295,35 @@ export async function rateWord(wordId: number, rating: number, taskType: "recept
   return { ok: true };
 }
 
-export async function skipPassage() {
+export async function skipPassage(passageId: string) {
   const user = getOrCreateUser();
+  const passage = passageById(passageId);
+  if (passage) {
+    const wordIds = [...new Set(passageMatches(passage).map((m) => m.wordId))];
+    logSkipDb(user.id, passageId, wordIds);
+  }
   clearReadingStateDb(user.id);
   incrementQuest(user.id, "passages");
-  awardPassageCoinsDb(user.id);
   const current = user.reading_level ?? 1;
   const next = Math.min(MAX_READING_TIER, current + 1);
   db.prepare("UPDATE users SET reading_level = ? WHERE id = ?").run(next, user.id);
+  const checkpoint = buildSkipCheckpointDb(user.id) !== null;
+  const skipsUntilCheckpoint = checkpoint ? 0 : SKIPS_PER_CHECKPOINT - pendingSkipCountDb(user.id);
   revalidatePath("/read");
   revalidatePath("/");
   revalidatePath("/rewards");
-  return { ok: true, level: next, capped: next === current, coins: PASSAGE_COMPLETION_REWARD };
+  return { ok: true, level: next, capped: next === current, checkpoint, skipsUntilCheckpoint };
+}
+
+export async function completeSkipCheckpoint() {
+  const user = getOrCreateUser();
+  if (!getSkipCheckpointDb(user.id)) return { ok: false as const, error: "No checkpoint pending." };
+  completeSkipCheckpointDb(user.id);
+  const coins = awardSkipCheckpointCoinsDb(user.id);
+  revalidatePath("/read");
+  revalidatePath("/");
+  revalidatePath("/rewards");
+  return { ok: true as const, coins };
 }
 
 export async function finishReadingPassage() {

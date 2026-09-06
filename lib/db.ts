@@ -162,6 +162,20 @@ export function initSchema() {
       UNIQUE(user_id, root_id)
     );
 
+    CREATE TABLE IF NOT EXISTS skip_log (
+      id INTEGER PRIMARY KEY,
+      user_id INTEGER NOT NULL REFERENCES users(id),
+      passage_id TEXT NOT NULL,
+      word_ids TEXT NOT NULL,
+      skipped_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+
+    CREATE TABLE IF NOT EXISTS skip_checkpoint (
+      user_id INTEGER PRIMARY KEY REFERENCES users(id),
+      word_ids TEXT NOT NULL,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+
     CREATE INDEX IF NOT EXISTS idx_progress_due ON progress(due);
     CREATE INDEX IF NOT EXISTS idx_words_root ON words(root_id);
   `);

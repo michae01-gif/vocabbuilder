@@ -174,3 +174,96 @@ export function distractorPool(excludeIds: number[], n = 40): string[] {
     .all(...excludeIds, n) as { word: string }[];
   return rows.map((r) => r.word);
 }
+
+export const SKIPS_PER_CHECKPOINT = 3;
+
+export function logSkipDb(userId: number, passageId: string, wordIds: number[]) {
+  getDb()
+    .prepare("INSERT INTO skip_log (user_id, passage_id, word_ids) VALUES (?, ?, ?)")
+    .run(userId, passageId, JSON.stringify(wordIds));
+}
+
+export function pendingSkipCountDb(userId: number): number {
+  return (getDb().prepare("SELECT COUNT(*) AS n FROM skip_log WHERE user_id = ?").get(userId) as { n: number }).n;
+}
+
+export function buildSkipCheckpointDb(userId: number): number[] | null {
+  const db = getDb();
+  const logs = db
+    .prepare(`SELECT word_ids FROM skip_log WHERE user_id = ? ORDER BY id LIMIT ${SKIPS_PER_CHECKPOINT}`)
+    .all(userId) as { word_ids: string }[];
+  if (logs.length < SKIPS_PER_CHECKPOINT) return null;
+
+  const ids = new Set<number>();
+  for (const l of logs) {
+    try {
+      for (const id of JSON.parse(l.word_ids) as number[]) ids.add(id);
+    } catch {
+      // ignore malformed rows
+    }
+  }
+  db.prepare("DELETE FROM skip_log WHERE user_id = ?").run(userId);
+
+  if (ids.size === 0) return null;
+  const wordIds = [...ids];
+  db.prepare(
+    `INSERT INTO skip_checkpoint (user_id, word_ids) VALUES (?, ?)
+     ON CONFLICT(user_id) DO UPDATE SET word_ids = excluded.word_ids, created_at = datetime('now')`
+  ).run(userId, JSON.stringify(wordIds));
+  return wordIds;
+}
+
+export function getSkipCheckpointDb(userId: number): number[] | null {
+  const row = getDb()
+    .prepare("SELECT word_ids FROM skip_checkpoint WHERE user_id = ?")
+    .get(userId) as { word_ids: string } | undefined;
+  if (!row) return null;
+  try {
+    const ids = JSON.parse(row.word_ids) as number[];
+    return Array.isArray(ids) && ids.length > 0 ? ids : null;
+  } catch {
+    return null;
+  }
+}
+
+export type CheckpointQuestion = {
+  id: number;
+  word: string;
+  definition: string;
+  options: string[];
+};
+
+export function checkpointQuizDb(userId: number): CheckpointQuestion[] {
+  const ids = getSkipCheckpointDb(userId);
+  if (!ids) return [];
+  const db = getDb();
+  const ph = ids.map(() => "?").join(",");
+  const words = db
+    .prepare(`SELECT id, word, definition FROM words WHERE id IN (${ph}) ORDER BY difficulty DESC, word`)
+    .all(...ids) as { id: number; word: string; definition: string }[];
+  if (words.length === 0) return [];
+
+  const distract = db
+    .prepare(`SELECT DISTINCT definition FROM words WHERE id NOT IN (${ph}) ORDER BY RANDOM() LIMIT ?`)
+    .all(...ids, words.length * 6) as { definition: string }[];
+  const pool = distract.map((d) => d.definition);
+
+  return words.map((w) => {
+    const wrong = new Set<string>();
+    while (wrong.size < 3 && pool.length > 0) {
+      const idx = Math.floor(Math.random() * pool.length);
+      const def = pool.splice(idx, 1)[0];
+      if (def !== w.definition) wrong.add(def);
+    }
+    const options = [w.definition, ...wrong];
+    for (let i = options.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [options[i], options[j]] = [options[j], options[i]];
+    }
+    return { id: w.id, word: w.word, definition: w.definition, options };
+  });
+}
+
+export function completeSkipCheckpointDb(userId: number) {
+  getDb().prepare("DELETE FROM skip_checkpoint WHERE user_id = ?").run(userId);
+}

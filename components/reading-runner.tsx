@@ -101,14 +101,22 @@ export default function ReadingRunner({
 
   function handleSkip() {
     startTransition(async () => {
-      const res = await skipPassage();
-      setSkipNote(
-        `+${res.coins} 🪙 passage bonus — ${
-          res.capped
-            ? "you're already at the highest tier — here's another summit-level passage."
-            : `moved up to tier ${res.level} — harder words await.`
-        }`
-      );
+      const res = await skipPassage(passage.id);
+      if (res.checkpoint) {
+        setSelected(new Set());
+        setSummary(null);
+        setSkipNote(null);
+        router.refresh();
+        return;
+      }
+      const tierNote = res.capped
+        ? "You're already at the highest tier — here's another summit-level passage."
+        : `Moved up to tier ${res.level} — harder words await.`;
+      const quizNote =
+        !res.checkpoint && res.skipsUntilCheckpoint > 0
+          ? ` Skip-checkpoint quiz in ${res.skipsUntilCheckpoint} more skip${res.skipsUntilCheckpoint === 1 ? "" : "s"} — 100 🪙 bonus.`
+          : "";
+      setSkipNote(tierNote + quizNote);
       setSelected(new Set());
       setSummary(null);
       router.refresh();
