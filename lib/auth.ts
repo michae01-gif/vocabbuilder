@@ -68,15 +68,4 @@ export async function sessionCookieOptions() {
   };
 }
 
-export function validateUsername(username: string): string | null {
-  if (!/^[a-zA-Z0-9_]{3,20}$/.test(username)) {
-    return "Username must be 3-20 characters (letters, numbers, underscores).";
-  }
-  return null;
-}
-
-export function validatePassword(password: string): string | null {
-  if (password.length < 6) return "Password must be at least 6 characters.";
-  if (password.length > 100) return "Password must be under 100 characters.";
-  return null;
-}
+export { validateUsername, validatePassword } from "./validate";

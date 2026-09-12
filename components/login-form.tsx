@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { signInAction, signUpAction } from "@/lib/auth-actions";
+import { validateUsername } from "@/lib/validate";
 
 export default function LoginForm() {
   const [mode, setMode] = useState<"signin" | "signup">("signup");
@@ -10,6 +11,9 @@ export default function LoginForm() {
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+
+  const liveHint = username.length > 0 ? validateUsername(username) : null;
+  const usernameOk = username.length > 0 && liveHint === null;
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -49,14 +53,24 @@ export default function LoginForm() {
       </div>
 
       <label className="block space-y-1.5">
-        <span className="text-xs uppercase tracking-widest text-zinc-500">Username</span>
+        <span className="text-xs uppercase tracking-widest text-zinc-500">
+          Username {usernameOk && <span className="text-emerald-400">✓</span>}
+        </span>
         <input
           value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          onChange={(e) => {
+            setUsername(e.target.value);
+            setError(null);
+          }}
           autoComplete="username"
-          placeholder="wordforger"
-          className="w-full rounded-xl border border-white/15 bg-black/30 px-4 py-2.5 text-zinc-100 outline-none transition-colors focus:border-amber-200/60"
+          placeholder="wordforger_99"
+          className={`w-full rounded-xl border bg-black/30 px-4 py-2.5 text-zinc-100 outline-none transition-colors ${
+            username.length > 0 && liveHint
+              ? "border-rose-400/50 focus:border-rose-400/70"
+              : "border-white/15 focus:border-amber-200/60"
+          }`}
         />
+        {liveHint && <span className="block text-xs text-rose-300">{liveHint}</span>}
       </label>
 
       <label className="block space-y-1.5">
