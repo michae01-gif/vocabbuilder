@@ -2,7 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 import { getDb } from "./db";
-import { getOrCreateUser, progressForWord, todayString } from "./data";
+import { progressForWord, todayString } from "./data";
+import { requireUser } from "./auth";
+import { trackEvent } from "./analytics";
 import { RATINGS, review, scheduleNew, type RatingValue } from "./srs";
 import { computeStage } from "./stage";
 import { evaluateSentence } from "./evaluate";
@@ -26,7 +28,10 @@ import { registerUsername as registerUsernameDb, updateLeaderboardScore } from "
 const db = getDb();
 
 function touchStreak(userId: number) {
-  const user = getOrCreateUser();
+  const user = db.prepare("SELECT streak, last_study_date FROM users WHERE id = ?").get(userId) as {
+    streak: number;
+    last_study_date: string | null;
+  };
   const today = todayString();
   const yesterday = new Date(Date.now() - 86400000).toLocaleDateString("en-CA");
   let streak = user.streak;
@@ -47,8 +52,9 @@ function revalidateAll() {
 }
 
 export async function completeWord(wordId: number, sentence: string, repaired = false) {
-  const user = getOrCreateUser();
+  const user = await requireUser();
   if (progressForWord(user.id, wordId)) return { ok: true };
+  trackEvent(user.id, "word_learned", { wordId });
 
   const info = scheduleNew(RATINGS.Good);
   const c = info.card;
@@ -130,10 +136,12 @@ export async function completeWord(wordId: number, sentence: string, repaired = 
 }
 
 export async function completeWordBatch(wordId: number, sentence: string, testCorrect: boolean) {
-  const user = getOrCreateUser();
+  const user = await requireUser();
   if (progressForWord(user.id, wordId)) {
+    trackEvent(user.id, "review_completed", { wordId });
     return rateWord(wordId, testCorrect ? RATINGS.Good : RATINGS.Again, "productive");
   }
+  trackEvent(user.id, "word_learned", { wordId });
 
   const info = scheduleNew(
     testCorrect ? RATINGS.Good : RATINGS.Again
@@ -229,9 +237,10 @@ export async function completeWordBatch(wordId: number, sentence: string, testCo
 }
 
 export async function rateWord(wordId: number, rating: number, taskType: "receptive" | "productive" | "duel" = "receptive") {
-  const user = getOrCreateUser();
+  const user = await requireUser();
   const p = progressForWord(user.id, wordId);
   if (!p) return { ok: false };
+  trackEvent(user.id, "review_completed", { wordId, taskType });
 
   const next = review(p, rating as RatingValue);
   db.prepare(
@@ -296,8 +305,9 @@ export async function rateWord(wordId: number, rating: number, taskType: "recept
 }
 
 export async function skipPassage(passageId: string) {
-  const user = getOrCreateUser();
+  const user = await requireUser();
   const passage = passageById(passageId);
+  trackEvent(user.id, "passage_read", { skipped: true });
   if (passage) {
     const wordIds = [...new Set(passageMatches(passage).map((m) => m.wordId))];
     logSkipDb(user.id, passageId, wordIds);
@@ -316,8 +326,9 @@ export async function skipPassage(passageId: string) {
 }
 
 export async function completeSkipCheckpoint() {
-  const user = getOrCreateUser();
+  const user = await requireUser();
   if (!getSkipCheckpointDb(user.id)) return { ok: false as const, error: "No checkpoint pending." };
+  trackEvent(user.id, "passage_read", { checkpoint: true });
   completeSkipCheckpointDb(user.id);
   const coins = awardSkipCheckpointCoinsDb(user.id);
   revalidatePath("/read");
@@ -327,10 +338,11 @@ export async function completeSkipCheckpoint() {
 }
 
 export async function finishReadingPassage() {
-  const user = getOrCreateUser();
+  const user = await requireUser();
   clearReadingStateDb(user.id);
   incrementQuest(user.id, "passages");
   awardPassageCoinsDb(user.id);
+  trackEvent(user.id, "passage_read", { completed: true });
   revalidatePath("/read");
   revalidatePath("/");
   revalidatePath("/rewards");
@@ -338,20 +350,21 @@ export async function finishReadingPassage() {
 }
 
 export async function saveReadingState(state: ReadingStateInput) {
-  const user = getOrCreateUser();
+  const user = await requireUser();
   saveReadingStateDb(user.id, state);
   return { ok: true };
 }
 
 export async function clearReadingState() {
-  const user = getOrCreateUser();
+  const user = await requireUser();
   clearReadingStateDb(user.id);
   return { ok: true };
 }
 
 export async function spinWheel() {
-  const user = getOrCreateUser();
+  const user = await requireUser();
   const result = spinWheelDb(user.id);
+  if (result) trackEvent(user.id, "spin_wheel", { amount: result.amount });
   revalidatePath("/rewards");
   revalidatePath("/");
   if (!result) return { ok: false as const, error: "Already spun today." };
@@ -359,15 +372,16 @@ export async function spinWheel() {
 }
 
 export async function claimQuest(type: QuestType) {
-  const user = getOrCreateUser();
+  const user = await requireUser();
   const result = claimQuestDb(user.id, type);
+  if (result.ok) trackEvent(user.id, "quest_claimed", { type });
   revalidatePath("/rewards");
   revalidatePath("/");
   return result;
 }
 
 export async function claimRoot(rootId: number) {
-  const user = getOrCreateUser();
+  const user = await requireUser();
   const result = claimRootDb(user.id, rootId);
   revalidatePath("/");
   revalidatePath("/garden");
@@ -375,15 +389,16 @@ export async function claimRoot(rootId: number) {
 }
 
 export async function buyItem(itemId: string) {
-  const user = getOrCreateUser();
+  const user = await requireUser();
   const result = buyItemDb(user.id, itemId);
+  if (result.ok) trackEvent(user.id, "purchase_made", { itemId });
   revalidatePath("/rewards");
   revalidatePath("/");
   return result;
 }
 
 export async function equipItem(itemId: string) {
-  const user = getOrCreateUser();
+  const user = await requireUser();
   const result = equipItemDb(user.id, itemId);
   revalidatePath("/rewards");
   revalidatePath("/");
@@ -391,7 +406,7 @@ export async function equipItem(itemId: string) {
 }
 
 export async function registerLeaderboardUsername(username: string) {
-  const user = getOrCreateUser();
+  const user = await requireUser();
   const result = registerUsernameDb(user.id, username);
   if (result.ok) {
     revalidatePath("/leaderboard");
@@ -401,7 +416,7 @@ export async function registerLeaderboardUsername(username: string) {
 }
 
 export async function syncLeaderboard() {
-  const user = getOrCreateUser();
+  const user = await requireUser();
   updateLeaderboardScore(user.id);
   revalidatePath("/leaderboard");
   return { ok: true };

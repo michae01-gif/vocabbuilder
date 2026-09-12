@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { signOutAction } from "@/lib/auth-actions";
 
 const links = [
   { href: "/", label: "Home" },
@@ -14,7 +15,7 @@ const links = [
   { href: "/rewards", label: "Rewards" },
 ];
 
-export default function Nav({ dueCount = 0, coins = 0, treeRewards = 0 }: { dueCount?: number; coins?: number; treeRewards?: number }) {
+export default function Nav({ dueCount = 0, coins = 0, treeRewards = 0, username }: { dueCount?: number; coins?: number; treeRewards?: number; username?: string | null }) {
   const pathname = usePathname();
   return (
     <header className="sticky top-0 z-20 border-b border-white/10 bg-[#0d0d12]/80 backdrop-blur">
@@ -59,6 +60,18 @@ export default function Nav({ dueCount = 0, coins = 0, treeRewards = 0 }: { dueC
               </Link>
             );
           })}
+          {username && (
+            <form action={signOutAction} className="ml-1 flex shrink-0 items-center gap-1.5 border-l border-white/10 pl-2">
+              <span className="hidden max-w-20 truncate text-[12px] text-zinc-500 md:inline">{username}</span>
+              <button
+                type="submit"
+                title="Sign out"
+                className="rounded-full px-1.5 py-1 text-[12px] text-zinc-500 transition-colors hover:bg-white/5 hover:text-zinc-200"
+              >
+                ⎋
+              </button>
+            </form>
+          )}
         </div>
       </nav>
     </header>

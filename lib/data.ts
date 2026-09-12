@@ -24,15 +24,6 @@ export type User = {
 
 const db = getDb();
 
-export function getOrCreateUser(): User {
-  let user = db.prepare("SELECT * FROM users WHERE id = 1").get() as User | undefined;
-  if (!user) {
-    db.prepare("INSERT INTO users (id) VALUES (1)").run();
-    user = db.prepare("SELECT * FROM users WHERE id = 1").get() as User;
-  }
-  return user;
-}
-
 export function todayString(): string {
   return new Date().toLocaleDateString("en-CA");
 }

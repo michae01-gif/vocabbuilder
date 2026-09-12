@@ -1,11 +1,12 @@
-import { getOrCreateUser, dueReviews, duelForWord } from "@/lib/data";
+import { requireUser } from "@/lib/auth";
+import { dueReviews, duelForWord } from "@/lib/data";
 import ReviewRunner from "@/components/review-runner";
 import type { DuelWithWords } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
-export default function ReviewPage() {
-  const user = getOrCreateUser();
+export default async function ReviewPage() {
+  const user = await requireUser();
   const cards = dueReviews(user.id, 50);
 
   const duels: DuelWithWords[] = [];

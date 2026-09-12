@@ -1,4 +1,4 @@
-import { getOrCreateUser } from "@/lib/data";
+import { requireUser } from "@/lib/auth";
 import {
   passageMatches,
   pickPassage,
@@ -14,8 +14,8 @@ import SkipCheckpoint from "@/components/skip-checkpoint";
 
 export const dynamic = "force-dynamic";
 
-export default function ReadPage() {
-  const user = getOrCreateUser();
+export default async function ReadPage() {
+  const user = await requireUser();
   const level = user.reading_level ?? 1;
 
   const checkpoint = getSkipCheckpointDb(user.id);
@@ -33,7 +33,7 @@ export default function ReadPage() {
   const matches = passageMatches(passage);
   const uniqueIds = [...new Set(matches.map((m) => m.wordId))];
   const words = lessonWordsByIds(uniqueIds);
-  const pool = distractorPool(uniqueIds, 40);
+  const pool = distractorPool(user.id, uniqueIds, 40);
 
   const validSelected = saved
     ? saved.selectedIds.filter((id) => uniqueIds.includes(id))

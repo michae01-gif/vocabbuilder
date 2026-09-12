@@ -2,7 +2,8 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Lora } from "next/font/google";
 import "./globals.css";
 import Nav from "@/components/nav";
-import { getOrCreateUser, userStats } from "@/lib/data";
+import { userStats } from "@/lib/data";
+import { getSessionUser } from "@/lib/auth";
 import { claimableRoots } from "@/lib/rewards";
 import { pageBackground } from "@/data/shop";
 import ThemeScene from "@/components/theme-scene";
@@ -50,10 +51,10 @@ export const viewport: Viewport = {
   userScalable: false,
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
-  const user = getOrCreateUser();
-  const stats = userStats(user.id);
-  const treeRewards = claimableRoots(user.id).length;
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const user = await getSessionUser();
+  const stats = user ? userStats(user.id) : null;
+  const treeRewards = user ? claimableRoots(user.id).length : 0;
 
   return (
     <html
@@ -66,11 +67,22 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
       </head>
       <body className="relative min-h-full flex flex-col">
-        <div aria-hidden className="fixed inset-0 -z-20" style={{ background: pageBackground(user.background) }} />
+        <div
+          aria-hidden
+          className="fixed inset-0 -z-20"
+          style={{ background: pageBackground(user?.background ?? "bg-forge") }}
+        />
         <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-          <ThemeScene backgroundId={user.background} avatar={user.avatar} />
+          <ThemeScene backgroundId={user?.background ?? "bg-forge"} avatar={user?.avatar ?? "🦉"} />
         </div>
-        <Nav dueCount={stats.due} coins={user.coins} treeRewards={treeRewards} />
+        {user && (
+          <Nav
+            dueCount={stats?.due ?? 0}
+            coins={user.coins}
+            treeRewards={treeRewards}
+            username={user.username}
+          />
+        )}
         <main className="mx-auto w-full max-w-4xl flex-1 px-4 pb-24 pt-8">{children}</main>
       </body>
     </html>

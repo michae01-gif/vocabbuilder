@@ -1,4 +1,5 @@
-import { getOrCreateUser, gardenData } from "@/lib/data";
+import { requireUser } from "@/lib/auth";
+import { gardenData } from "@/lib/data";
 import { claimableRoots, ROOT_COMPLETION_REWARD } from "@/lib/rewards";
 import { stageMeta } from "@/lib/stage";
 import RootClaimButton from "@/components/root-claim-button";
@@ -6,8 +7,8 @@ import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
-export default function GardenPage() {
-  const user = getOrCreateUser();
+export default async function GardenPage() {
+  const user = await requireUser();
   const trees = gardenData(user.id);
   const claimable = new Map(claimableRoots(user.id).map((r) => [r.rootId, r]));
   const totalLearned = trees.reduce((n, t) => n + t.learned, 0);

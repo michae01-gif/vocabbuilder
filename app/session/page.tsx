@@ -1,11 +1,14 @@
-import { getOrCreateUser, currentRoot, newWordsForRoot, reviewLoad } from "@/lib/data";
+import { requireUser } from "@/lib/auth";
+import { currentRoot, newWordsForRoot, reviewLoad } from "@/lib/data";
 import LessonRunner from "@/components/lesson-runner";
 import { lessonWordsByIds, distractorPool } from "@/lib/reading";
+import { trackEvent } from "@/lib/analytics";
 
 export const dynamic = "force-dynamic";
 
-export default function SessionPage() {
-  const user = getOrCreateUser();
+export default async function SessionPage() {
+  const user = await requireUser();
+  trackEvent(user.id, "session_start");
   const root = currentRoot(user.id);
   const all = newWordsForRoot(user.id, root.id);
   const load = reviewLoad(user.id);
@@ -29,7 +32,7 @@ export default function SessionPage() {
           subtitle: `${root.language} root family`,
           note: root.story,
         }}
-        distractorPool={distractorPool(batch.map((w) => w.id), 40)}
+        distractorPool={distractorPool(user.id, batch.map((w) => w.id), 40)}
       />
     </div>
   );

@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { getOrCreateUser, currentRoot, newWordsForRoot, userStats, wordCountTotal, rootCountTotal, todayString } from "@/lib/data";
+import { requireUser } from "@/lib/auth";
+import { currentRoot, newWordsForRoot, userStats, wordCountTotal, rootCountTotal, todayString } from "@/lib/data";
 import { levelForWordCount } from "@/lib/types";
 import { bannerCss, frameStyle, nameStyle } from "@/data/shop";
 import { getTodayQuests, claimableRoots, ROOT_COMPLETION_REWARD } from "@/lib/rewards";
@@ -19,8 +20,8 @@ const GREETINGS = [
   "Let's get loquacious! 🗣️",
 ];
 
-export default function Home() {
-  const user = getOrCreateUser();
+export default async function Home() {
+  const user = await requireUser();
   const stats = userStats(user.id);
   const total = wordCountTotal();
   const root = currentRoot(user.id);

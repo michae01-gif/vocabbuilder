@@ -1,5 +1,4 @@
 import { getDb } from "./db";
-import { getOrCreateUser } from "./data";
 
 const db = getDb();
 
@@ -110,8 +109,11 @@ export function getLeaderboard(userId?: number): LeaderboardEntry[] {
     )
     .all() as { username: string; xp: number; words_mastered: number; streak: number; last_active: string; is_ai: number }[];
 
-  const user = userId != null ? getOrCreateUser() : null;
-  const userUsername = user ? (db.prepare("SELECT username FROM users WHERE id = ?").get(userId!) as { username: string | null } | undefined)?.username : null;
+  const userUsername =
+    userId != null
+      ? (db.prepare("SELECT username FROM users WHERE id = ?").get(userId) as { username: string | null } | undefined)
+          ?.username ?? null
+      : null;
 
   return rows.map((r, i) => ({
     rank: i + 1,

@@ -1,11 +1,11 @@
-import { getOrCreateUser } from "@/lib/data";
+import { requireUser } from "@/lib/auth";
 import { getLeaderboard, getUserRank, updateLeaderboardScore } from "@/lib/leaderboard";
 import RegisterUsernameForm from "@/components/register-username-form";
 
 export const dynamic = "force-dynamic";
 
-export default function LeaderboardPage() {
-  const user = getOrCreateUser();
+export default async function LeaderboardPage() {
+  const user = await requireUser();
   updateLeaderboardScore(user.id);
 
   const entries = getLeaderboard(user.id);

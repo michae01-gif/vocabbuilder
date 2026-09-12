@@ -1,6 +1,6 @@
 import { getDb } from "@/lib/db";
+import { requireUser } from "@/lib/auth";
 import {
-  getOrCreateUser,
   userStats,
   wordCountTotal,
   rootCountTotal,
@@ -18,9 +18,9 @@ import {
 
 export const dynamic = "force-dynamic";
 
-export default function StatsPage() {
+export default async function StatsPage() {
   const db = getDb();
-  const user = getOrCreateUser();
+  const user = await requireUser();
   const stats = userStats(user.id);
   const total = wordCountTotal();
   const { level, next } = levelForWordCount(stats.introduced);

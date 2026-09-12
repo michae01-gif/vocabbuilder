@@ -1,11 +1,11 @@
 import Link from "next/link";
-import { getOrCreateUser } from "@/lib/data";
+import { requireUser } from "@/lib/auth";
 import CoinShopClient from "@/components/coin-shop-client";
 
 export const dynamic = "force-dynamic";
 
-export default function CoinShopPage() {
-  const user = getOrCreateUser();
+export default async function CoinShopPage() {
+  const user = await requireUser();
 
   return (
     <div className="rise space-y-6">

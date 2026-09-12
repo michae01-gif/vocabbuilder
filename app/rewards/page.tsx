@@ -1,13 +1,14 @@
 import Link from "next/link";
-import { getOrCreateUser, todayString } from "@/lib/data";
+import { requireUser } from "@/lib/auth";
+import { todayString } from "@/lib/data";
 import { getOwnedItemIds } from "@/lib/rewards";
 import Wheel from "@/components/wheel";
 import Shop from "@/components/shop";
 
 export const dynamic = "force-dynamic";
 
-export default function RewardsPage() {
-  const user = getOrCreateUser();
+export default async function RewardsPage() {
+  const user = await requireUser();
   const owned = [...getOwnedItemIds(user.id)];
   const spunToday = user.last_spin_date === todayString();
 

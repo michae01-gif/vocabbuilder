@@ -163,15 +163,15 @@ export function lessonWordsByIds(ids: number[]): LessonWord[] {
   return rows;
 }
 
-export function distractorPool(excludeIds: number[], n = 40): string[] {
+export function distractorPool(userId: number, excludeIds: number[], n = 40): string[] {
   const db = getDb();
   const rows = db
     .prepare(
-      `SELECT word FROM words WHERE id NOT IN (SELECT word_id FROM progress WHERE user_id = 1)
+      `SELECT word FROM words WHERE id NOT IN (SELECT word_id FROM progress WHERE user_id = ?)
        ${excludeIds.length ? `AND id NOT IN (${excludeIds.map(() => "?").join(",")})` : ""}
        ORDER BY RANDOM() LIMIT ?`
     )
-    .all(...excludeIds, n) as { word: string }[];
+    .all(userId, ...excludeIds, n) as { word: string }[];
   return rows.map((r) => r.word);
 }
 

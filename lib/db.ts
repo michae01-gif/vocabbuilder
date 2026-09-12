@@ -176,6 +176,13 @@ export function initSchema() {
       created_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
 
+    CREATE TABLE IF NOT EXISTS auth_sessions (
+      token TEXT PRIMARY KEY,
+      user_id INTEGER NOT NULL REFERENCES users(id),
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      expires_at TEXT NOT NULL
+    );
+
     CREATE INDEX IF NOT EXISTS idx_progress_due ON progress(due);
     CREATE INDEX IF NOT EXISTS idx_words_root ON words(root_id);
   `);
@@ -263,6 +270,14 @@ function migrateUsers() {
   if (!has("background")) {
     tryAlter("ALTER TABLE users ADD COLUMN background TEXT NOT NULL DEFAULT 'bg-forge'");
   }
+  if (!has("password_hash")) {
+    tryAlter("ALTER TABLE users ADD COLUMN password_hash TEXT");
+  }
+  if (!has("username")) {
+    tryAlter("ALTER TABLE users ADD COLUMN username TEXT");
+  }
+  db.exec("CREATE INDEX IF NOT EXISTS idx_users_username ON users(username)");
+  db.exec("CREATE INDEX IF NOT EXISTS idx_auth_sessions_user ON auth_sessions(user_id)");
 }
 
 initSchema();
