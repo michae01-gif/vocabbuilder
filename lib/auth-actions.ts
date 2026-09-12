@@ -33,7 +33,7 @@ export async function signUpAction(username: string, password: string) {
 
   const token = createSessionDb(userId);
   const store = await cookies();
-  store.set(SESSION_COOKIE, token, sessionCookieOptions());
+  store.set(SESSION_COOKIE, token, await sessionCookieOptions());
   revalidatePath("/");
   redirect("/");
 }
@@ -51,7 +51,7 @@ export async function signInAction(username: string, password: string) {
 
   const token = createSessionDb(user.id);
   const store = await cookies();
-  store.set(SESSION_COOKIE, token, sessionCookieOptions());
+  store.set(SESSION_COOKIE, token, await sessionCookieOptions());
   revalidatePath("/");
   redirect("/");
 }

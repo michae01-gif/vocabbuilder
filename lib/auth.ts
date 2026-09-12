@@ -1,4 +1,4 @@
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { randomBytes, scryptSync, timingSafeEqual } from "crypto";
 import { getDb } from "./db";
@@ -56,11 +56,13 @@ export async function requireUser(): Promise<User> {
   return user;
 }
 
-export function sessionCookieOptions() {
+export async function sessionCookieOptions() {
+  const h = await headers();
+  const isHttps = h.get("x-forwarded-proto") === "https";
   return {
     httpOnly: true,
     sameSite: "lax" as const,
-    secure: process.env.NODE_ENV === "production",
+    secure: isHttps,
     path: "/",
     maxAge: SESSION_DAYS * 86400,
   };
