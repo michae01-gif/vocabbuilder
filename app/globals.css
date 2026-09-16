@@ -289,3 +289,28 @@ a:active {
   from { width: 0; }
   to { width: 100%; }
 }
+
+@keyframes demo-glow {
+  0%, 45% { border-color: rgba(255,255,255,0.12); background: rgba(255,255,255,0.03); transform: scale(1); }
+  60%, 90% { border-color: rgba(251,191,36,0.6); background: rgba(251,191,36,0.1); transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+@keyframes demo-rain {
+  0% { transform: translateY(-26px) scale(0.9); opacity: 0; }
+  25% { opacity: 1; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+@keyframes demo-cursor-home {
+  0% { transform: translate(-70px, -44px); opacity: 0; }
+  25% { opacity: 1; }
+  55% { transform: translate(0, 0) scale(1); }
+  65% { transform: scale(0.75); }
+  75%, 100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes demo-equip-btn {
+  0%, 55% { transform: scale(0.9); background: transparent; }
+  70%, 100% { transform: scale(1); background: rgba(251,191,36,0.9); color: #000; }
+}
