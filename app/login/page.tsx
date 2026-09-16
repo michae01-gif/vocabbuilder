@@ -39,15 +39,16 @@ export default function LoginPage() {
             </span>
           </div>
           <h1 className="font-[var(--font-lora)] text-4xl font-bold leading-tight text-zinc-50 sm:text-5xl">
-            Learn <span className="text-amber-200">one root.</span>
+            A <span className="text-amber-200">bigger vocabulary</span>,
             <br />
-            Unlock <span className="text-amber-200">twelve words.</span>
+            five minutes a day.
           </h1>
           <p className="max-w-xl text-base leading-relaxed text-zinc-400">
-            Most apps make you memorize word lists. WordForge teaches you the{" "}
+            WordForge teaches the{" "}
             <span className="text-zinc-200">Greek &amp; Latin roots behind English</span> — so every
-            new word you learn makes the next ten easier. Read real passages, tap what you don&apos;t
-            know, prove it in quick quizzes, and watch your vocabulary garden grow.
+            new word makes the next ten easier. Read real passages, tap what you don&apos;t know,
+            prove it in quick quizzes, and watch your vocabulary garden grow, one daily session at a
+            time.
           </p>
         </header>
 
