@@ -11,11 +11,13 @@ import {
 } from "@/lib/reading";
 import ReadingRunner from "@/components/reading-runner";
 import SkipCheckpoint from "@/components/skip-checkpoint";
+import { advanceTutorialDb } from "@/lib/tutorial";
 
 export const dynamic = "force-dynamic";
 
 export default async function ReadPage() {
   const user = await requireUser();
+  advanceTutorialDb(user.id, 2);
   const level = user.reading_level ?? 1;
 
   const checkpoint = getSkipCheckpointDb(user.id);

@@ -27,7 +27,7 @@ export async function signUpAction(username: string, password: string) {
   if (taken) return { ok: false as const, error: "That username is already taken." };
 
   const info = db
-    .prepare("INSERT INTO users (name, username, password_hash, coins) VALUES (?, ?, ?, 100)")
+    .prepare("INSERT INTO users (name, username, password_hash, coins, tutorial_step) VALUES (?, ?, ?, 100, 1)")
     .run(uname, uname, hashPassword(password));
   const userId = Number(info.lastInsertRowid);
 

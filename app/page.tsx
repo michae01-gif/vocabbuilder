@@ -4,20 +4,22 @@ import { currentRoot, newWordsForRoot, userStats, wordCountTotal, rootCountTotal
 import { levelForWordCount } from "@/lib/types";
 import { bannerCss, frameStyle, nameStyle } from "@/data/shop";
 import { getTodayQuests, claimableRoots, ROOT_COMPLETION_REWARD } from "@/lib/rewards";
+import { getTutorialStepDb } from "@/lib/tutorial";
 import Wheel from "@/components/wheel";
 import Quests from "@/components/quests";
 import Mascot from "@/components/mascot";
+import TutorialGate from "@/components/tutorial-gate";
 
 export const dynamic = "force-dynamic";
 
 const GREETINGS = [
   "Ready to forge some words? 🔨",
   "New roots await, boss! 🌱",
-  "Spin me right round… 🎡",
   "Big words, big brain 🧠",
   "Your vocabulary misses you 📚",
   "Erudite o'clock! ⏰",
   "Let's get loquacious! 🗣️",
+  "One session a day keeps the blank mind away 🌱",
 ];
 
 export default async function Home() {
@@ -28,10 +30,12 @@ export default async function Home() {
   const fresh = newWordsForRoot(user.id, root.id);
   const quests = getTodayQuests(user.id);
   const claimableTrees = claimableRoots(user.id);
+  const tutorial = getTutorialStepDb(user.id);
   const { level } = levelForWordCount(stats.introduced);
   const pct = Math.round((stats.introduced / total) * 100);
   const doneForToday = fresh.length === 0;
   const greeting = GREETINGS[new Date().getDay() % GREETINGS.length];
+  const z = (id: string) => (tutorial?.targetId === id ? "relative z-[80]" : "relative");
 
   return (
     <div className="rise space-y-8">
@@ -86,7 +90,101 @@ export default async function Home() {
         </h1>
       </section>
 
-      {/* Daily rewards: wheel + quests */}
+      {/* START HERE — the one obvious thing to do */}
+      <section className="space-y-3">
+        <div className="flex items-center gap-2.5">
+          <span className="text-lg">⚡</span>
+          <h2 className="text-sm font-bold uppercase tracking-[0.2em] text-amber-200">Start here</h2>
+          <span className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[11px] text-zinc-500">
+            ~5 min
+          </span>
+        </div>
+
+        <div className="grid gap-3 lg:grid-cols-[1.35fr_1fr_1fr_1fr]">
+          {/* Primary: today's session */}
+          <Link
+            id="tutorial-session"
+            href="/session"
+            className={`group flex flex-col justify-between gap-3 rounded-2xl bg-amber-200 p-5 text-black shadow-lg shadow-amber-200/20 transition-all hover:bg-amber-100 active:scale-[0.99] ${z("tutorial-session")}`}
+          >
+            <div className="flex items-start justify-between gap-2">
+              <span className="text-3xl">{root.emoji}</span>
+              {fresh.length > 0 && (
+                <span className="rounded-full bg-black/15 px-2 py-0.5 text-[11px] font-bold">
+                  {fresh.length} new words
+                </span>
+              )}
+            </div>
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-widest text-black/60">
+                {doneForToday ? "Next root" : "Today's session"}
+              </p>
+              <h3 className="font-[var(--font-lora)] text-xl font-bold leading-tight">
+                {doneForToday ? `Explore “${root.root}”` : `Learn “${root.root}” — ${root.meaning}`}
+              </h3>
+              <p className="mt-1 text-[13px] font-medium text-black/70 group-hover:underline">
+                ▶ START session →
+              </p>
+            </div>
+          </Link>
+
+          {/* Secondary: read */}
+          <Link
+            id="tutorial-read"
+            href="/read"
+            className={`group flex flex-col justify-between gap-3 rounded-2xl border border-violet-300/30 bg-gradient-to-br from-violet-300/15 to-transparent p-5 transition-all hover:border-violet-300/60 ${z("tutorial-read")}`}
+          >
+            <span className="text-2xl">📖</span>
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-widest text-violet-300/80">Read</p>
+              <h3 className="mt-0.5 font-[var(--font-lora)] text-lg font-semibold leading-tight">A passage with your words</h3>
+              <p className="mt-1 text-[12px] font-medium text-violet-300 group-hover:underline">Read a passage →</p>
+            </div>
+          </Link>
+
+          {/* Secondary: review */}
+          <Link
+            id="tutorial-review"
+            href="/review"
+            className={`group flex flex-col justify-between gap-3 rounded-2xl border border-emerald-300/30 bg-gradient-to-br from-emerald-300/15 to-transparent p-5 transition-all hover:border-emerald-300/60 ${z("tutorial-review")}`}
+          >
+            <div className="flex items-start justify-between">
+              <span className="text-2xl">🔄</span>
+              {stats.due > 0 && (
+                <span className="rounded-full bg-emerald-300/20 px-2 py-0.5 text-[11px] font-bold text-emerald-300">
+                  {stats.due} due
+                </span>
+              )}
+            </div>
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-widest text-emerald-300/80">Review</p>
+              <h3 className="mt-0.5 font-[var(--font-lora)] text-lg font-semibold leading-tight">Lock in what you learned</h3>
+              <p className="mt-1 text-[12px] font-medium text-emerald-300 group-hover:underline">Review words →</p>
+            </div>
+          </Link>
+
+          {/* Secondary: rewards */}
+          <Link
+            id="tutorial-rewards"
+            href="/rewards"
+            className={`group flex flex-col justify-between gap-3 rounded-2xl border border-white/15 bg-gradient-to-br from-white/[0.07] to-transparent p-5 transition-all hover:border-amber-200/40 ${z("tutorial-rewards")}`}
+          >
+            <div className="flex items-start justify-between">
+              <span className="text-2xl">🪙</span>
+              <span className="rounded-full border border-amber-200/30 bg-amber-200/10 px-2 py-0.5 text-[11px] font-bold text-amber-200">
+                {user.coins}
+              </span>
+            </div>
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-widest text-amber-200/70">Rewards</p>
+              <h3 className="mt-0.5 font-[var(--font-lora)] text-lg font-semibold leading-tight">Spend coins on mascots &amp; themes</h3>
+              <p className="mt-1 text-[12px] font-medium text-amber-200/90 group-hover:underline">Open shop →</p>
+            </div>
+          </Link>
+        </div>
+      </section>
+
+      {/* Daily rewards: wheel + quests (demoted below the fold) */}
       <section className="grid gap-6 lg:grid-cols-2">
         <Wheel
           coins={user.coins}
@@ -126,76 +224,6 @@ export default async function Home() {
           </Link>
         </section>
       )}
-
-      {/* Action Cards */}
-      <section className="grid gap-4 sm:grid-cols-2">
-        <Link
-          href="/session"
-          className="group rounded-2xl border border-amber-200/25 bg-gradient-to-br from-amber-200/10 to-transparent p-6 transition-all hover:border-amber-200/50 hover:from-amber-200/15"
-        >
-          <div className="mb-3 flex items-center gap-3">
-            <span className="text-3xl">{root.emoji}</span>
-            {fresh.length > 0 && (
-              <span className="rounded-full bg-amber-200/20 px-2 py-0.5 text-xs font-medium text-amber-200">
-                {fresh.length} new
-              </span>
-            )}
-          </div>
-          <h2 className="font-[var(--font-lora)] text-2xl font-semibold">Today&apos;s session</h2>
-          <p className="mt-2 text-sm text-zinc-400">
-            {doneForToday
-              ? "You've explored every word of this root — pick the next one."
-              : `Root "${root.root}" — ${fresh.length} new word${fresh.length === 1 ? "" : "s"} to unlock.`}
-          </p>
-          <p className="mt-4 text-sm font-medium text-amber-200 group-hover:underline">
-            {doneForToday ? "Explore next root →" : "Grow your word tree →"}
-          </p>
-        </Link>
-
-        <Link
-          href="/review"
-          className="group rounded-2xl border border-white/10 bg-white/[0.03] p-6 transition-all hover:border-emerald-200/40"
-        >
-          <div className="mb-3 flex items-center gap-3">
-            <span className="text-3xl">{stats.due > 0 ? "🧠" : "🌤️"}</span>
-            {stats.due > 0 && (
-              <span className="rounded-full bg-emerald-300/20 px-2 py-0.5 text-xs font-medium text-emerald-300">
-                {stats.due} due
-              </span>
-            )}
-          </div>
-          <h2 className="font-[var(--font-lora)] text-2xl font-semibold">Review</h2>
-          <p className="mt-2 text-sm text-zinc-400">
-            {stats.due > 0
-              ? `${stats.due} card${stats.due === 1 ? "" : "s"} ready on your spaced-repetition schedule.`
-              : "No reviews due right now. Come back tomorrow."}
-          </p>
-          <p className="mt-4 text-sm font-medium text-emerald-300 group-hover:underline">
-            {stats.due > 0 ? `Review now →` : "All caught up ✓"}
-          </p>
-        </Link>
-      </section>
-
-      {/* Reading challenge banner */}
-      <section>
-        <Link
-          href="/read"
-          className="group flex flex-col gap-3 rounded-2xl border border-violet-300/25 bg-gradient-to-br from-violet-300/10 to-transparent p-6 transition-all hover:border-violet-300/50 sm:flex-row sm:items-center sm:justify-between"
-        >
-          <div className="flex items-center gap-4">
-            <span className="text-3xl">📖</span>
-            <div>
-              <h2 className="font-[var(--font-lora)] text-xl font-semibold">Reading challenge</h2>
-              <p className="text-sm text-zinc-400">
-                A short passage dotted with forge words — tap the ones you don&apos;t know and learn them in a lesson.
-              </p>
-            </div>
-          </div>
-          <span className="text-sm font-medium text-violet-300 group-hover:underline">
-            Read a passage →
-          </span>
-        </Link>
-      </section>
 
       {/* Quick Stats */}
       <section className="grid gap-4 sm:grid-cols-4">
@@ -249,6 +277,9 @@ export default async function Home() {
           />
         </div>
       </section>
+
+      {/* CoD-style forced tutorial overlay */}
+      {tutorial && <TutorialGate def={tutorial} />}
     </div>
   );
 }

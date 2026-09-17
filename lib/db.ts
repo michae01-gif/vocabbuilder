@@ -276,6 +276,9 @@ function migrateUsers() {
   if (!has("username")) {
     tryAlter("ALTER TABLE users ADD COLUMN username TEXT");
   }
+  if (!has("tutorial_step")) {
+    tryAlter("ALTER TABLE users ADD COLUMN tutorial_step INTEGER NOT NULL DEFAULT 0");
+  }
   db.exec("CREATE INDEX IF NOT EXISTS idx_users_username ON users(username)");
   db.exec("CREATE INDEX IF NOT EXISTS idx_auth_sessions_user ON auth_sessions(user_id)");
 }

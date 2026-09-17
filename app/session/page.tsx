@@ -3,11 +3,13 @@ import { currentRoot, newWordsForRoot, reviewLoad } from "@/lib/data";
 import LessonRunner from "@/components/lesson-runner";
 import { lessonWordsByIds, distractorPool } from "@/lib/reading";
 import { trackEvent } from "@/lib/analytics";
+import { advanceTutorialDb } from "@/lib/tutorial";
 
 export const dynamic = "force-dynamic";
 
 export default async function SessionPage() {
   const user = await requireUser();
+  advanceTutorialDb(user.id, 1);
   trackEvent(user.id, "session_start");
   const root = currentRoot(user.id);
   const all = newWordsForRoot(user.id, root.id);

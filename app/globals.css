@@ -314,3 +314,37 @@ a:active {
   0%, 55% { transform: scale(0.9); background: transparent; }
   70%, 100% { transform: scale(1); background: rgba(251,191,36,0.9); color: #000; }
 }
+
+/* ===== Tutorial gate (CoD-style spotlight) ===== */
+
+@keyframes tutorial-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.55), 0 0 24px rgba(251, 191, 36, 0.25); }
+  50% { box-shadow: 0 0 0 10px rgba(251, 191, 36, 0), 0 0 36px rgba(251, 191, 36, 0.45); }
+}
+
+.tutorial-ring {
+  border: 3px solid #fbbf24;
+  animation: tutorial-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes tutorial-bounce-y {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+.tutorial-bounce {
+  animation: tutorial-bounce-y 0.8s ease-in-out infinite;
+}
+
+@keyframes tutorial-shake-x {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-7px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(3px); }
+}
+
+.tutorial-shake {
+  animation: tutorial-shake-x 0.45s ease both;
+  border-color: #f87171 !important;
+}
