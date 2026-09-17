@@ -1,41 +1,53 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { TutorialStepDef } from "@/lib/tutorial";
 
 export default function TutorialGate({ def }: { def: TutorialStepDef }) {
   const [rect, setRect] = useState<DOMRect | null>(null);
+  const rectRef = useRef<DOMRect | null>(null);
   const [shake, setShake] = useState(false);
 
-  const measure = useCallback(() => {
-    const el = document.getElementById(def.targetId);
-    if (el) setRect(el.getBoundingClientRect());
+  // Track the target every frame so the ring always matches — entrance
+  // animations, font loading, and layout shifts can't desync it.
+  useEffect(() => {
+    let raf = 0;
+    const tick = () => {
+      const el = document.getElementById(def.targetId);
+      if (el) {
+        const r = el.getBoundingClientRect();
+        const last = rectRef.current;
+        const moved =
+          !last ||
+          Math.abs(last.left - r.left) > 0.5 ||
+          Math.abs(last.top - r.top) > 0.5 ||
+          Math.abs(last.width - r.width) > 0.5 ||
+          Math.abs(last.height - r.height) > 0.5;
+        if (moved) {
+          rectRef.current = r;
+          setRect(r);
+        }
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
   }, [def.targetId]);
 
+  // Bring the target into view so the spotlight is always on screen
   useEffect(() => {
-    const raf = requestAnimationFrame(measure);
-    window.addEventListener("resize", measure);
-    window.addEventListener("scroll", measure, true);
-    return () => {
-      cancelAnimationFrame(raf);
-      window.removeEventListener("resize", measure);
-      window.removeEventListener("scroll", measure, true);
-    };
-  }, [measure]);
-
-  useEffect(() => {
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, []);
+    const t = window.setTimeout(() => {
+      const el = document.getElementById(def.targetId);
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 150);
+    return () => window.clearTimeout(t);
+  }, [def.targetId]);
 
   function nudge() {
     setShake(true);
     window.setTimeout(() => setShake(false), 500);
   }
 
-  const showSpotlight = rect !== null;
   const pad = 8;
   const bubbleBelow = rect ? rect.bottom + 132 < window.innerHeight : true;
   const bubbleTop = rect && bubbleBelow ? rect.bottom + 14 : undefined;
@@ -53,9 +65,9 @@ export default function TutorialGate({ def }: { def: TutorialStepDef }) {
         aria-hidden
       />
 
-      {showSpotlight && rect && (
+      {rect && (
         <>
-          {/* Pulsing spotlight ring around the target */}
+          {/* Pulsing spotlight ring around the target — coordinates update every frame */}
           <div
             className="tutorial-ring pointer-events-none fixed z-[90] rounded-2xl"
             style={{
