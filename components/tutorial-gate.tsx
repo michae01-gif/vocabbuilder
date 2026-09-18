@@ -1,12 +1,19 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import type { TutorialStepDef } from "@/lib/tutorial";
 
 export default function TutorialGate({ def }: { def: TutorialStepDef }) {
+  const [mounted, setMounted] = useState(false);
   const [rect, setRect] = useState<DOMRect | null>(null);
   const rectRef = useRef<DOMRect | null>(null);
   const [shake, setShake] = useState(false);
+
+  useEffect(() => {
+    const raf = requestAnimationFrame(() => setMounted(true));
+    return () => cancelAnimationFrame(raf);
+  }, []);
 
   // Track the target every frame so the ring always matches — entrance
   // animations, font loading, and layout shifts can't desync it.
@@ -34,19 +41,23 @@ export default function TutorialGate({ def }: { def: TutorialStepDef }) {
     return () => cancelAnimationFrame(raf);
   }, [def.targetId]);
 
-  // Bring the target into view so the spotlight is always on screen
+  // Jump the target into view instantly, then freeze page scrolling so
+  // nothing below the fold (e.g. the spin wheel) is ever reachable.
   useEffect(() => {
-    const t = window.setTimeout(() => {
-      const el = document.getElementById(def.targetId);
-      if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
-    }, 150);
-    return () => window.clearTimeout(t);
+    const el = document.getElementById(def.targetId);
+    if (el) el.scrollIntoView({ block: "center" });
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [def.targetId]);
 
   function nudge() {
     setShake(true);
     window.setTimeout(() => setShake(false), 500);
   }
+
+  if (!mounted) return null;
 
   const pad = 8;
   const bubbleBelow = rect ? rect.bottom + 132 < window.innerHeight : true;
@@ -56,11 +67,15 @@ export default function TutorialGate({ def }: { def: TutorialStepDef }) {
     ? Math.max(12, Math.min(rect.left + rect.width / 2 - 150, window.innerWidth - 312))
     : 12;
 
-  return (
+  // Portaled to <body>: no ancestor stacking contexts can ever trap the
+  // overlay. Oversized 64px beyond every edge so no rendering gap (Safari
+  // fullscreen repaint quirks, dvh rounding) can expose page content.
+  return createPortal(
     <>
       {/* Backdrop: blocks everything except the highlighted target (which sits above via z-index) */}
       <div
-        className="fixed inset-0 z-[70] bg-black/75 backdrop-blur-[2px]"
+        className="fixed z-[70] bg-black/80"
+        style={{ inset: "-64px" }}
         onClick={nudge}
         aria-hidden
       />
@@ -104,6 +119,7 @@ export default function TutorialGate({ def }: { def: TutorialStepDef }) {
           </div>
         </>
       )}
-    </>
+    </>,
+    document.body
   );
 }
