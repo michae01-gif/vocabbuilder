@@ -35,7 +35,7 @@ export async function signUpAction(username: string, password: string) {
   const store = await cookies();
   store.set(SESSION_COOKIE, token, await sessionCookieOptions());
   revalidatePath("/");
-  redirect("/");
+  redirect("/session");
 }
 
 export async function signInAction(username: string, password: string) {

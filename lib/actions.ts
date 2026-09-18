@@ -24,8 +24,16 @@ import {
 } from "./reading";
 import { spinWheelDb, claimQuestDb, buyItemDb, equipItemDb, incrementQuest, claimRootDb, awardPassageCoinsDb, awardSkipCheckpointCoinsDb, PASSAGE_COMPLETION_REWARD, type QuestType } from "./rewards";
 import { registerUsername as registerUsernameDb, updateLeaderboardScore } from "./leaderboard";
+import { advanceTutorialDb } from "./tutorial";
 
 const db = getDb();
+
+export async function finishTutorialSession() {
+  const user = await requireUser();
+  advanceTutorialDb(user.id, 1);
+  revalidateAll();
+  return { ok: true };
+}
 
 function touchStreak(userId: number) {
   const user = db.prepare("SELECT streak, last_study_date FROM users WHERE id = ?").get(userId) as {
