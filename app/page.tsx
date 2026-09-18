@@ -38,7 +38,10 @@ export default async function Home() {
   const z = (id: string) => (tutorial?.targetId === id ? "relative z-[80]" : "relative");
 
   return (
-    <div className="rise space-y-8">
+    <div className="space-y-8">
+      {/* NOTE: no transform-based entrance animation here (e.g. "rise") —
+          it creates a stacking context that traps the tutorial overlay
+          underneath the sticky nav, breaking the tutorial lockdown. */}
       {/* Hero: animated profile card */}
       <section className="relative flex flex-col items-center gap-4 pt-4 text-center">
         <span className="float-slow pointer-events-none absolute left-[6%] top-6 z-0 text-xl">✨</span>
