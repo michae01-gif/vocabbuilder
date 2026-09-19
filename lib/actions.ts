@@ -35,6 +35,13 @@ export async function finishTutorialSession() {
   return { ok: true };
 }
 
+export async function finishTutorialReading() {
+  const user = await requireUser();
+  advanceTutorialDb(user.id, 2);
+  revalidateAll();
+  return { ok: true };
+}
+
 function touchStreak(userId: number) {
   const user = db.prepare("SELECT streak, last_study_date FROM users WHERE id = ?").get(userId) as {
     streak: number;

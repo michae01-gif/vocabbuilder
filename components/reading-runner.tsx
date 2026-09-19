@@ -3,8 +3,9 @@
 import { useCallback, useMemo, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { skipPassage, saveReadingState, clearReadingState, finishReadingPassage } from "@/lib/actions";
+import { skipPassage, saveReadingState, clearReadingState, finishReadingPassage, finishTutorialReading } from "@/lib/actions";
 import LessonRunner from "./lesson-runner";
+import CoachMark from "./coach-mark";
 import type { LessonWord, VocabMatch } from "@/lib/reading";
 import type { Passage } from "@/data/passages";
 
@@ -26,6 +27,7 @@ export default function ReadingRunner({
   pool,
   level,
   initial,
+  tutorialAvatar,
 }: {
   passage: Passage;
   matches: VocabMatch[];
@@ -33,6 +35,7 @@ export default function ReadingRunner({
   pool: string[];
   level: number;
   initial?: ReadingInitial;
+  tutorialAvatar?: string;
 }) {
   const router = useRouter();
   const [selected, setSelected] = useState<Set<number>>(() => new Set(initial?.selectedIds ?? []));
@@ -42,6 +45,7 @@ export default function ReadingRunner({
   const [pending, startTransition] = useTransition();
   const [skipNote, setSkipNote] = useState<string | null>(null);
   const [summary, setSummary] = useState<{ correct: number; total: number; coins: number } | null>(null);
+  const [bridge, setBridge] = useState<null | "lesson" | "skip">(null);
 
   const wordById = useMemo(() => {
     const m = new Map<number, LessonWord>();
@@ -109,6 +113,14 @@ export default function ReadingRunner({
         router.refresh();
         return;
       }
+      setSelected(new Set());
+      setSummary(null);
+      if (tutorialAvatar) {
+        setSkipNote(null);
+        setBridge("skip");
+        router.refresh();
+        return;
+      }
       const tierNote = res.capped
         ? "You're already at the highest tier — here's another summit-level passage."
         : `Moved up to tier ${res.level} — harder words await.`;
@@ -117,8 +129,6 @@ export default function ReadingRunner({
           ? ` Skip-checkpoint quiz in ${res.skipsUntilCheckpoint} more skip${res.skipsUntilCheckpoint === 1 ? "" : "s"} — 100 🪙 bonus.`
           : "";
       setSkipNote(tierNote + quizNote);
-      setSelected(new Set());
-      setSummary(null);
       router.refresh();
     });
   }
@@ -128,8 +138,41 @@ export default function ReadingRunner({
       const res = await finishReadingPassage();
       setSummary({ ...s, coins: res.coins });
       setView("post");
+      if (tutorialAvatar) setBridge("lesson");
     });
   }
+
+  function continueTutorial() {
+    startTransition(async () => {
+      await finishTutorialReading();
+      router.push("/");
+    });
+  }
+
+  const bridgeMark = tutorialAvatar && bridge ? (
+    <CoachMark
+      avatar={tutorialAvatar}
+      label={bridge === "skip" ? "You knew them all!" : "Reading complete!"}
+      cta={pending ? "Saving…" : "Next: review words"}
+      onContinue={continueTutorial}
+    >
+      <p>
+        {bridge === "skip" ? (
+          <>
+            Impressive — you knew every word in that passage! 🎉 Even so, the real test is{" "}
+            <span className="font-semibold text-amber-100">locking words into memory</span>. Review
+            brings each one back right before you&apos;d forget it.
+          </>
+        ) : (
+          <>
+            🎉 You just met your words alive in a real passage — that&apos;s how vocabulary sticks!
+            Now let&apos;s <span className="font-semibold text-amber-100">lock in what you
+            learned</span>: Review brings each word back right before you&apos;d forget it.
+          </>
+        )}
+      </p>
+    </CoachMark>
+  ) : null;
 
   function nextPassage() {
     void clearReadingState();
@@ -234,6 +277,7 @@ export default function ReadingRunner({
             Back home
           </Link>
         </div>
+        {bridgeMark}
       </div>
     );
   }
@@ -293,6 +337,8 @@ export default function ReadingRunner({
             : `Start lesson — ${selected.size} word${selected.size === 1 ? "" : "s"} →`}
         </button>
       </div>
+
+      {bridgeMark}
     </div>
   );
 }
