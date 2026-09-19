@@ -2,7 +2,7 @@ import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { currentRoot, newWordsForRoot, userStats, wordCountTotal, rootCountTotal, todayString } from "@/lib/data";
 import { levelForWordCount } from "@/lib/types";
-import { bannerCss, frameStyle, nameStyle } from "@/data/shop";
+import { nameStyle } from "@/data/shop";
 import { getTodayQuests, claimableRoots, ROOT_COMPLETION_REWARD } from "@/lib/rewards";
 import { getTutorialStepDb } from "@/lib/tutorial";
 import Wheel from "@/components/wheel";
@@ -11,16 +11,6 @@ import Mascot from "@/components/mascot";
 import TutorialGate from "@/components/tutorial-gate";
 
 export const dynamic = "force-dynamic";
-
-const GREETINGS = [
-  "Ready to forge some words? 🔨",
-  "New roots await, boss! 🌱",
-  "Big words, big brain 🧠",
-  "Your vocabulary misses you 📚",
-  "Erudite o'clock! ⏰",
-  "Let's get loquacious! 🗣️",
-  "One session a day keeps the blank mind away 🌱",
-];
 
 export default async function Home() {
   const user = await requireUser();
@@ -34,65 +24,99 @@ export default async function Home() {
   const { level } = levelForWordCount(stats.introduced);
   const pct = Math.round((stats.introduced / total) * 100);
   const doneForToday = fresh.length === 0;
-  const greeting = GREETINGS[new Date().getDay() % GREETINGS.length];
   const z = (id: string) => (tutorial?.targetId === id ? "relative z-[80]" : "relative");
 
+  const claimableQuests = quests.filter((q) => !q.claimed && q.progress >= q.target);
+
+  const overdue =
+    stats.due > 0
+      ? {
+          href: "/review",
+          icon: "🔄",
+          title: `${stats.due} review${stats.due === 1 ? "" : "s"} overdue`,
+          sub: "Your words are slipping — lock them back in now",
+          cta: "Review now",
+          accent: "border-rose-400/50 hover:border-rose-400/80 from-rose-400/15",
+          btn: "bg-rose-400",
+        }
+      : !doneForToday
+        ? {
+            href: "/session",
+            icon: "🌱",
+            title: "Today's session is waiting",
+            sub: `“${root.root}” — ${fresh.length} new word${fresh.length === 1 ? "" : "s"} ready to unlock`,
+            cta: "Start session",
+            accent: "border-amber-200/50 hover:border-amber-200/80 from-amber-200/15",
+            btn: "bg-amber-200",
+          }
+        : claimableQuests.length > 0
+          ? {
+              href: "/rewards",
+              icon: "🎁",
+              title: `${claimableQuests.length} quest reward${claimableQuests.length === 1 ? "" : "s"} unclaimed`,
+              sub: "You finished the work — collect your coins",
+              cta: "Claim rewards",
+              accent: "border-emerald-300/50 hover:border-emerald-300/80 from-emerald-300/15",
+              btn: "bg-emerald-300",
+            }
+          : null;
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* NOTE: no transform-based entrance animation here (e.g. "rise") —
           it creates a stacking context that traps the tutorial overlay
           underneath the sticky nav, breaking the tutorial lockdown. */}
-      {/* Hero: animated profile card */}
-      <section className="relative flex flex-col items-center gap-4 pt-4 text-center">
-        <span className="float-slow pointer-events-none absolute left-[6%] top-6 z-0 text-xl">✨</span>
-        <span className="float-slow pointer-events-none absolute right-[8%] top-14 z-0 text-lg" style={{ animationDelay: "0.7s" }}>⭐</span>
-        <span className="float-slow pointer-events-none absolute left-[14%] bottom-0 z-0 text-base" style={{ animationDelay: "1.4s" }}>💫</span>
-        <span className="float-slow pointer-events-none absolute right-[16%] bottom-2 z-0 text-lg" style={{ animationDelay: "2s" }}>✨</span>
 
-        <div className="pop relative z-20 rounded-2xl rounded-bl-md border border-white/15 bg-white/10 px-4 py-2 text-sm font-medium text-zinc-100 backdrop-blur">
-          {greeting}
-        </div>
-
-        <div
-          className="relative z-10 w-full max-w-lg overflow-hidden rounded-3xl border border-white/15 shadow-2xl"
-          style={{ background: bannerCss(user.banner), ...frameStyle(user.frame) }}
-        >
-          <div className="absolute inset-0 bg-black/35" />
-          <div className="relative flex items-center gap-4 p-5 sm:gap-5 sm:p-6">
-            <div className="mascot-bob -ml-1 shrink-0">
-              <Mascot emoji={user.avatar} size={108} dance className="drop-shadow-xl" />
-            </div>
-            <div className="min-w-0 flex-1 text-left">
-              <p className="truncate font-[var(--font-lora)] text-2xl font-bold drop-shadow" style={nameStyle(user.name_style)}>
-                {user.name}
-              </p>
-              <p className="truncate text-sm font-medium text-white/90">
-                {level.name}
-              </p>
-              <div className="mt-2 flex flex-wrap gap-1.5">
-                <span className="rounded-full border border-white/20 bg-black/30 px-2.5 py-0.5 text-[11px] font-medium text-white/90">
-                  🔥 {user.streak}-day streak
-                </span>
-                <span className="rounded-full border border-white/20 bg-black/30 px-2.5 py-0.5 text-[11px] font-medium text-white/90">
-                  📚 {stats.introduced} words
-                </span>
-                <span className="rounded-full border border-white/20 bg-black/30 px-2.5 py-0.5 text-[11px] font-medium text-white/90">
-                  ⚡ {user.xp} XP
-                </span>
-              </div>
-            </div>
-            <div className="flex shrink-0 flex-col items-center gap-0.5 rounded-2xl border border-white/25 bg-black/40 px-4 py-3 shadow-lg">
-              <span className="text-2xl">🪙</span>
-              <span className="font-[var(--font-lora)] text-xl font-bold leading-none text-amber-200">{user.coins}</span>
-            </div>
+      {/* Compact profile strip */}
+      <section className="flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-2.5">
+        <div className="flex min-w-0 items-center gap-3">
+          <div className="mascot-bob shrink-0">
+            <Mascot emoji={user.avatar} size={40} />
+          </div>
+          <div className="min-w-0">
+            <p className="truncate font-[var(--font-lora)] text-base font-bold leading-tight" style={nameStyle(user.name_style)}>
+              {user.name}
+            </p>
+            <p className="truncate text-xs text-zinc-500">
+              {level.name} · 📚 {stats.introduced} words
+            </p>
           </div>
         </div>
-
-        <h1 className="font-[var(--font-lora)] text-3xl font-bold tracking-tight text-shadow-soft sm:text-4xl">
-          Forge your <span className="text-amber-200">erudite</span> vocabulary
-        </h1>
+        <div className="flex shrink-0 items-center gap-1.5 text-[11px] font-medium">
+          <span className="rounded-full border border-white/10 bg-black/30 px-2 py-1 text-zinc-300">🔥 {user.streak}</span>
+          <span className="rounded-full border border-white/10 bg-black/30 px-2 py-1 text-zinc-300">⚡ {user.xp}</span>
+        </div>
       </section>
 
+      {/* BIG overdue task banner — the dominant element when work is incomplete */}
+      {overdue ? (
+        <section>
+          <Link
+            href={overdue.href}
+            className={`group flex items-center justify-between gap-4 rounded-2xl border-2 bg-gradient-to-br to-transparent p-6 shadow-lg transition-all sm:p-7 ${overdue.accent}`}
+          >
+            <div className="flex min-w-0 items-center gap-4">
+              <span className="claim-badge shrink-0 text-4xl sm:text-5xl">{overdue.icon}</span>
+              <div className="min-w-0">
+                <h2 className="font-[var(--font-lora)] text-2xl font-bold leading-tight sm:text-3xl">
+                  {overdue.title}
+                </h2>
+                <p className="mt-1 text-sm text-zinc-400">{overdue.sub}</p>
+              </div>
+            </div>
+            <span
+              className={`shrink-0 rounded-full px-5 py-2.5 text-sm font-bold text-black transition-transform group-hover:scale-105 ${overdue.btn}`}
+            >
+              {overdue.cta} →
+            </span>
+          </Link>
+        </section>
+      ) : (
+        <section className="flex items-center justify-center gap-2 rounded-2xl border border-emerald-300/30 bg-emerald-300/[0.07] px-4 py-3 text-sm text-emerald-200">
+          <span>✅</span>
+          <p>All caught up — today&apos;s tasks are complete. See you tomorrow!</p>
+        </section>
+      )}
       {/* START HERE — the one obvious thing to do */}
       <section className="space-y-3">
         <div className="flex items-center gap-2.5">
