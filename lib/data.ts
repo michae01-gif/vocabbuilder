@@ -20,6 +20,7 @@ export type User = {
   name_style: string;
   background: string;
   username: string | null;
+  paste_warnings: number;
 };
 
 const db = getDb();

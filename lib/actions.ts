@@ -23,6 +23,7 @@ import {
   type ReadingStateInput,
 } from "./reading";
 import { spinWheelDb, claimQuestDb, buyItemDb, equipItemDb, incrementQuest, claimRootDb, awardPassageCoinsDb, awardSkipCheckpointCoinsDb, PASSAGE_COMPLETION_REWARD, type QuestType } from "./rewards";
+import { validateWriting, PASTE_PENALTY_COINS, PASTE_WARNINGS_LIMIT, PARAGRAPH_BONUS_COINS } from "./validate-writing";
 import { registerUsername as registerUsernameDb, updateLeaderboardScore } from "./leaderboard";
 import { advanceTutorialDb } from "./tutorial";
 
@@ -40,6 +41,40 @@ export async function finishTutorialReading() {
   advanceTutorialDb(user.id, 2);
   revalidateAll();
   return { ok: true };
+}
+
+export async function registerPasteWarning() {
+  const user = await requireUser();
+  const warnings = user.paste_warnings + 1;
+  if (warnings >= PASTE_WARNINGS_LIMIT) {
+    db.prepare("UPDATE users SET paste_warnings = 0, coins = MAX(0, coins - ?) WHERE id = ?").run(
+      PASTE_PENALTY_COINS,
+      user.id
+    );
+    revalidateAll();
+    return { ok: true as const, warnings: 0, penalized: true as const, coinsLost: PASTE_PENALTY_COINS };
+  }
+  db.prepare("UPDATE users SET paste_warnings = ? WHERE id = ?").run(warnings, user.id);
+  revalidateAll();
+  return { ok: true as const, warnings, penalized: false as const, coinsLost: 0 };
+}
+
+export async function completeReviewParagraph(text: string, wordIds: number[]) {
+  const user = await requireUser();
+  const words = wordIds.length
+    ? (db.prepare(`SELECT word FROM words WHERE id IN (${wordIds.map(() => "?").join(",")})`).all(...wordIds) as {
+        word: string;
+      }[]).map((w) => w.word)
+    : [];
+  const err = validateWriting(text, { minWords: 30, requireWords: words, label: "paragraph" });
+  if (err) return { ok: false as const, error: err };
+
+  db.prepare("UPDATE users SET coins = coins + ?, xp = xp + 20 WHERE id = ?").run(
+    PARAGRAPH_BONUS_COINS,
+    user.id
+  );
+  revalidateAll();
+  return { ok: true as const, reward: PARAGRAPH_BONUS_COINS };
 }
 
 function touchStreak(userId: number) {

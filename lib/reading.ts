@@ -267,3 +267,34 @@ export function checkpointQuizDb(userId: number): CheckpointQuestion[] {
 export function completeSkipCheckpointDb(userId: number) {
   getDb().prepare("DELETE FROM skip_checkpoint WHERE user_id = ?").run(userId);
 }
+
+/** Builds 4-option definition MCQs for the given word ids (correct + 3 distractors, shuffled). */
+export function definitionMcqDb(wordIds: number[]): Record<number, string[]> {
+  const out: Record<number, string[]> = {};
+  if (wordIds.length === 0) return out;
+  const db = getDb();
+  const ph = wordIds.map(() => "?").join(",");
+  const words = db
+    .prepare(`SELECT id, definition FROM words WHERE id IN (${ph}) AND definition <> ''`)
+    .all(...wordIds) as { id: number; definition: string }[];
+  const distract = db
+    .prepare(`SELECT DISTINCT definition FROM words WHERE id NOT IN (${ph}) AND definition <> '' ORDER BY RANDOM() LIMIT ?`)
+    .all(...wordIds, words.length * 8) as { definition: string }[];
+  const pool = distract.map((d) => d.definition);
+
+  for (const w of words) {
+    const wrong = new Set<string>();
+    while (wrong.size < 3 && pool.length > 0) {
+      const idx = Math.floor(Math.random() * pool.length);
+      const def = pool.splice(idx, 1)[0];
+      if (def !== w.definition) wrong.add(def);
+    }
+    const options = [w.definition, ...wrong];
+    for (let i = options.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [options[i], options[j]] = [options[j], options[i]];
+    }
+    out[w.id] = options;
+  }
+  return out;
+}

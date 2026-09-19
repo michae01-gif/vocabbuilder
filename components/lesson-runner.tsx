@@ -4,7 +4,10 @@ import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import { completeWordBatch } from "@/lib/actions";
 import type { LessonWord } from "@/lib/reading";
+import { validateWriting } from "@/lib/validate-writing";
 import SpeakButton from "./speak-button";
+import GuardedTextarea from "./guarded-textarea";
+import { usePasteGuard } from "./use-paste-guard";
 
 type Phase = "teach" | "produce" | "test" | "done";
 type LessonPhase = "teach" | "produce" | "test";
@@ -44,6 +47,8 @@ export default function LessonRunner({
 }) {
   const [phase, setPhase] = useState<Phase>(initial?.phase ?? "teach");
   const [sentences, setSentences] = useState<Record<number, string>>(initial?.sentences ?? {});
+  const [sentenceErrors, setSentenceErrors] = useState<Record<number, string | null>>({});
+  const pasteGuard = usePasteGuard();
   const [testResults, setTestResults] = useState<TestResult[]>(initial?.testResults ?? []);
   const [currentTestIdx, setCurrentTestIdx] = useState(initial?.testIdx ?? 0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
@@ -75,14 +80,20 @@ export default function LessonRunner({
 
   function handleSentenceChange(wordId: number, value: string) {
     setSentences((s) => ({ ...s, [wordId]: value }));
+    setSentenceErrors((e) => ({ ...e, [wordId]: null }));
   }
 
   function submitSentences() {
-    const completed = words.filter((w) => (sentences[w.id] ?? "").trim().length >= 3);
-    if (completed.length < Math.ceil(words.length / 2)) {
-      alert("Try to write at least a few sentences before testing.");
-      return;
+    const errors: Record<number, string | null> = {};
+    for (const w of words) {
+      errors[w.id] = validateWriting(sentences[w.id] ?? "", {
+        minWords: 10,
+        requireWord: w.word,
+        label: "sentence",
+      });
     }
+    setSentenceErrors(errors);
+    if (Object.values(errors).some(Boolean)) return;
     setPhase("test");
     setCurrentTestIdx(0);
     setSelectedAnswer(null);
@@ -243,8 +254,11 @@ export default function LessonRunner({
         <div className="space-y-5">
           <h2 className="font-[var(--font-lora)] text-xl font-semibold">Use the words</h2>
           <p className="text-sm text-zinc-400">
-            Write a sentence using each word. No copying the examples — push the word into a new context.
+            Write a sentence using each word — at least <span className="text-amber-200">10 words</span>,
+            in your own words (any form of the word counts). Pasting is blocked: three warnings costs{" "}
+            <span className="text-amber-200">500 🪙</span>.
           </p>
+          {pasteGuard.banner}
           {words.map((w, i) => (
             <div key={w.id} className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
               <div className="mb-2 flex items-baseline gap-2 flex-wrap">
@@ -252,13 +266,17 @@ export default function LessonRunner({
                 <span className="font-semibold">{w.word}</span>
                 <span className="text-xs text-zinc-500">— {w.definition}</span>
               </div>
-              <textarea
+              <GuardedTextarea
                 value={sentences[w.id] ?? ""}
-                onChange={(e) => handleSentenceChange(w.id, e.target.value)}
+                onChange={(v) => handleSentenceChange(w.id, v)}
+                onPasteBlocked={pasteGuard.trigger}
                 rows={2}
                 placeholder={`A sentence using "${w.word}" that shows you understand it...`}
                 className="w-full resize-none rounded-xl border border-white/10 bg-black/20 p-3 text-zinc-100 placeholder-zinc-600 outline-none transition-colors focus:border-amber-200/50"
               />
+              {sentenceErrors[w.id] && (
+                <p className="mt-1.5 text-sm text-rose-300">{sentenceErrors[w.id]}</p>
+              )}
             </div>
           ))}
           <div className="flex gap-3">
