@@ -97,9 +97,8 @@ function SceneHome() {
           </span>
         </div>
         <div className="relative flex flex-col items-center justify-center gap-1 rounded-lg border border-white/10 bg-white/[0.03] p-1.5">
-          <span className="text-lg">🔄</span>
-          <span className="text-[10px] text-zinc-400">Review</span>
-          <span className="absolute -top-1 -right-1 flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-emerald-300 px-1 text-[8px] font-bold text-black">12</span>
+          <span className="text-lg">🏆</span>
+          <span className="text-[10px] text-zinc-400">Mastered</span>
         </div>
       </div>
       <p className="mt-1.5 text-[10px] text-zinc-600">A few taps a day — everything lives here</p>

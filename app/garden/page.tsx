@@ -51,9 +51,7 @@ export default async function GardenPage() {
           <span>🌱 Unseen</span>
           <span>🌿 Recognised</span>
           <span>💧 Recalled</span>
-          <span>⚖️ Discriminated</span>
           <span>✍️ Produced</span>
-          <span>🔀 Transferred</span>
           <span>🏆 Mastered</span>
           <span>🥀 Lapsed</span>
         </div>

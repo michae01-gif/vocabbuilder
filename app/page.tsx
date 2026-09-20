@@ -268,7 +268,7 @@ export default async function Home() {
           <Link href="/garden" className="text-xs text-amber-200/70 hover:text-amber-200">View garden →</Link>
         </div>
         <div className="flex items-center gap-1 text-xs">
-          {["🌱", "🌿", "💧", "⚖️", "✍️", "🔀", "🏆"].map((icon, i) => {
+          {["🌱", "🌿", "💧", "✍️", "🏆"].map((icon, i) => {
             const count = stats.introduced > 0 ? Math.min(1, Math.max(0, (stats.mastered / Math.max(stats.introduced, 1)) * 7 - i)) : 0;
             return (
               <div key={i} className="flex flex-col items-center gap-1 flex-1">

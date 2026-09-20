@@ -42,7 +42,11 @@ export function userStats(userId: number) {
   const progressRows = db.prepare("SELECT * FROM progress WHERE user_id = ?").all(userId) as Progress[];
   const stages = progressRows.map((p) => computeStage(p));
   const mastered = stages.filter((s) => s === "mastered").length;
-  const produced = stages.filter((s) => s === "produced" || s === "transferred" || s === "mastered").length;
+  const produced = (
+    db
+      .prepare("SELECT COUNT(*) AS n FROM progress WHERE user_id = ? AND production_passes >= 1")
+      .get(userId) as { n: number }
+  ).n;
   const recalled = stages.filter((s) => s === "recalled").length;
   const lapsed = stages.filter((s) => s === "lapsed").length;
   const due = (

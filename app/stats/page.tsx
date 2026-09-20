@@ -60,7 +60,7 @@ export default async function StatsPage() {
     { icon: "🔥", label: "On Fire", done: user.streak >= 7 },
     { icon: "🏆", label: "First Master", done: stats.mastered >= 1 },
     { icon: "✍️", label: "Producer", done: stats.produced >= 5 },
-    { icon: "🧠", label: "Review Streak", done: stats.reviewsTotal >= 20 },
+    { icon: "🧠", label: "Recall Streak", done: stats.reviewsTotal >= 20 },
     { icon: "💎", label: "Scholar", done: stats.introduced >= 40 },
     { icon: "👑", label: "Erudite", done: stats.introduced >= 600 },
   ];
@@ -83,7 +83,7 @@ export default async function StatsPage() {
       <section className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         <Metric label="Level" value={level.name} accent />
         <Metric label="Vocabulary" value={`${stats.introduced}`} sub={`/ ${total} words`} />
-        <Metric label="Mastered" value={String(stats.mastered)} sub="mastery gate" />
+        <Metric label="Mastered" value={String(stats.mastered)} sub="in your keeping" />
         <Metric label="Roots" value={`${stats.rootsExplored}`} sub={`/ ${rootCountTotal()}`} />
       </section>
 
@@ -91,11 +91,11 @@ export default async function StatsPage() {
       <section className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         <Metric label="Streak" value={`${user.streak} days`} icon="🔥" />
         <Metric label="Total XP" value={String(user.xp)} icon="⚡" />
-        <Metric label="Reviews" value={String(stats.reviewsTotal)} icon="🧠" />
+        <Metric label="Recall" value={String(stats.reviewsTotal)} icon="🧠" />
         <Metric
           label="Accuracy"
           value={totalReviews > 0 ? `${accuracy}%` : "—"}
-          sub={totalReviews > 0 ? `${ratingMap[3] + ratingMap[4]}/${totalReviews} correct` : "no reviews yet"}
+          sub={totalReviews > 0 ? `${ratingMap[3] + ratingMap[4]}/${totalReviews} correct` : "no recall tests yet"}
           icon="🎯"
         />
       </section>
@@ -128,17 +128,16 @@ export default async function StatsPage() {
       <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
         <h2 className="mb-4 font-[var(--font-lora)] text-xl font-semibold">Mastery ladder</h2>
         <p className="mb-4 text-sm text-zinc-500">
-          Mastery needs three productive recalls across 14+ days, a natural production, a Precision Duel pass, and a
-          transfer. Recognition alone never counts.
+          A word is <span className="text-zinc-200">mastered</span> once you keep recalling it correctly
+          across lessons that are days apart. Producing it in your own writing carries it further —
+          recognition alone never counts.
         </p>
         <div className="flex flex-wrap gap-2">
           {[
             "unseen",
             "recognised",
             "recalled",
-            "discriminated",
             "produced",
-            "transferred",
             "mastered",
             "lapsed",
           ].map((s) => {
@@ -174,11 +173,11 @@ export default async function StatsPage() {
         </section>
       )}
 
-      {/* Review chart */}
+      {/* Recall chart */}
       <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
-        <h2 className="mb-4 font-[var(--font-lora)] text-xl font-semibold">Reviews — last 14 days</h2>
+        <h2 className="mb-4 font-[var(--font-lora)] text-xl font-semibold">Recall — last 14 days</h2>
         {days.length === 0 ? (
-          <p className="text-sm text-zinc-500 py-8 text-center">No reviews yet. Complete a session to start building your review history.</p>
+          <p className="text-sm text-zinc-500 py-8 text-center">No recall tests yet. Complete a session to start building your recall history.</p>
         ) : (
           <div className="flex h-40 items-end gap-2">
             {days.map((d) => (
@@ -186,7 +185,7 @@ export default async function StatsPage() {
                 <div
                   className="w-full rounded-t-md bg-emerald-300/70 transition-all"
                   style={{ height: `${Math.max((d.n / maxDay) * 100, 4)}%` }}
-                  title={`${d.day}: ${d.n} reviews`}
+                  title={`${d.day}: ${d.n} recall tests`}
                 />
                 <span className="text-[10px] text-zinc-600">{d.day.slice(5)}</span>
               </div>
@@ -195,9 +194,9 @@ export default async function StatsPage() {
         )}
       </section>
 
-      {/* Review quality */}
+      {/* Recall quality */}
       <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
-        <h2 className="mb-4 font-[var(--font-lora)] text-xl font-semibold">Review quality</h2>
+        <h2 className="mb-4 font-[var(--font-lora)] text-xl font-semibold">Recall quality</h2>
         <div className="grid gap-3 sm:grid-cols-2">
           <QualityBar label="Again" count={ratingMap[1]} total={totalReviews} color="bg-rose-300" desc="Forgot" />
           <QualityBar label="Hard" count={ratingMap[2]} total={totalReviews} color="bg-orange-300" desc="Struggled" />
@@ -278,7 +277,7 @@ export default async function StatsPage() {
             </div>
             <div>
               <p className="font-[var(--font-lora)] text-2xl font-bold">{session.totalReviews}</p>
-              <p className="text-xs text-zinc-500">reviews</p>
+              <p className="text-xs text-zinc-500">recall tests</p>
             </div>
           </div>
         </div>

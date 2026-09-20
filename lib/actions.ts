@@ -154,11 +154,12 @@ function touchStreak(userId: number) {
 function revalidateAll() {
   revalidatePath("/");
   revalidatePath("/session");
-  revalidatePath("/review");
   revalidatePath("/garden");
   revalidatePath("/stats");
   revalidatePath("/rewards");
   revalidatePath("/leaderboard");
+  revalidatePath("/mastered");
+  revalidatePath("/weekly-test");
 }
 
 export async function completeWord(wordId: number, sentence: string, repaired = false) {
@@ -283,6 +284,7 @@ export async function completeWordBatch(wordId: number, sentence: string, testCo
   const productive_successes = testCorrect ? 1 : 0;
   const first_productive_at = testCorrect ? new Date().toISOString() : null;
   const last_productive_at = testCorrect ? new Date().toISOString() : null;
+  const insertedStage = testCorrect ? (passed ? "produced" : "recalled") : "recognised";
 
   db.prepare(
     `INSERT INTO progress (user_id, word_id, due, stability, difficulty, elapsed_days, scheduled_days, reps, lapses, state, last_review, stage,
@@ -301,7 +303,7 @@ export async function completeWordBatch(wordId: number, sentence: string, testCo
     c.lapses,
     c.state,
     c.last_review ? c.last_review.toISOString() : null,
-    "recognised",
+    insertedStage,
     productive_successes,
     0,
     0,
@@ -378,10 +380,14 @@ export async function rateWord(wordId: number, rating: number, taskType: "recept
   }
   if (taskType === "receptive" && correct) projected.receptive_successes += 1;
   if (taskType === "duel" && correct) projected.discrimination_successes += 1;
-  if (rating === RATINGS.Again && p.mastered_at) projected.lapsed_at = now;
+  if (rating === RATINGS.Again && p.mastered_at) {
+    projected.mastered_at = null;
+    projected.lapsed_at = now;
+  } else if (!projected.mastered_at && next.state >= 2) {
+    projected.mastered_at = now;
+  }
   const stage = computeStage(projected);
   projected.stage = stage;
-  if (stage === "mastered" && !projected.mastered_at) projected.mastered_at = now;
 
   db.prepare(
     `UPDATE progress SET first_productive_at = ?, last_productive_at = ?, productive_successes = ?, receptive_successes = ?,
