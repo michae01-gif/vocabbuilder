@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Lora } from "next/font/google";
 import "./globals.css";
 import Nav from "@/components/nav";
-import { userStats } from "@/lib/data";
 import { getSessionUser } from "@/lib/auth";
 import { claimableRoots } from "@/lib/rewards";
 import { pageBackground } from "@/data/shop";
@@ -53,7 +52,6 @@ export const viewport: Viewport = {
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   const user = await getSessionUser();
-  const stats = user ? userStats(user.id) : null;
   const treeRewards = user ? claimableRoots(user.id).length : 0;
 
   return (
@@ -75,14 +73,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
         <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
           <ThemeScene backgroundId={user?.background ?? "bg-forge"} avatar={user?.avatar ?? "🦉"} />
         </div>
-        {user && (
-          <Nav
-            dueCount={stats?.due ?? 0}
-            coins={user.coins}
-            treeRewards={treeRewards}
-            username={user.username}
-          />
-        )}
+        {user && <Nav coins={user.coins} treeRewards={treeRewards} username={user.username} />}
         <main className="mx-auto w-full max-w-4xl flex-1 px-4 pb-24 pt-8">{children}</main>
       </body>
     </html>

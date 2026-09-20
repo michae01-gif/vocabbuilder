@@ -27,13 +27,6 @@ export const TUTORIAL_STEPS: TutorialStepDef[] = [
   },
   {
     step: 3,
-    targetId: "tutorial-review",
-    href: "/review",
-    title: "Lock it in with review",
-    text: "Words come back right before you'd forget them — tap REVIEW WORDS.",
-  },
-  {
-    step: 4,
     targetId: "tutorial-rewards",
     href: "/rewards",
     title: "See what coins can buy",

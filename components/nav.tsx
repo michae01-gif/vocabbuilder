@@ -8,14 +8,14 @@ const links = [
   { href: "/", label: "Home" },
   { href: "/session", label: "Learn" },
   { href: "/read", label: "Read" },
-  { href: "/review", label: "Review", badge: true },
   { href: "/garden", label: "Garden", treeBadge: true },
   { href: "/leaderboard", label: "Ranks" },
+  { href: "/mastered", label: "Mastered" },
   { href: "/stats", label: "Stats" },
   { href: "/rewards", label: "Rewards" },
 ];
 
-export default function Nav({ dueCount = 0, coins = 0, treeRewards = 0, username }: { dueCount?: number; coins?: number; treeRewards?: number; username?: string | null }) {
+export default function Nav({ coins = 0, treeRewards = 0, username }: { coins?: number; treeRewards?: number; username?: string | null }) {
   const pathname = usePathname();
   return (
     <header className="sticky top-0 z-20 border-b border-white/10 bg-[#0d0d12]/80 backdrop-blur">
@@ -47,11 +47,6 @@ export default function Nav({ dueCount = 0, coins = 0, treeRewards = 0, username
                 }`}
               >
                 {l.label}
-                {l.badge && dueCount > 0 && (
-                  <span className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-emerald-300 px-1 text-[10px] font-bold text-black">
-                    {dueCount > 99 ? "99+" : dueCount}
-                  </span>
-                )}
                 {"treeBadge" in l && l.treeBadge && treeRewards > 0 && (
                   <span className="claim-badge absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full border-2 border-amber-200 bg-rose-500 text-[11px] font-black text-white shadow">
                     !

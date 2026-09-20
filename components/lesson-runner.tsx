@@ -69,9 +69,14 @@ export default function LessonRunner({
         <div className="text-5xl">🎉</div>
         <h1 className="font-[var(--font-lora)] text-3xl font-bold">Nothing to learn here!</h1>
         <p className="max-w-md text-zinc-400">These words are already in your keeping.</p>
-        <Link href="/review" className="rounded-full bg-amber-200 px-6 py-2.5 font-medium text-black">
-          Go to review
-        </Link>
+        <div className="flex flex-wrap justify-center gap-3">
+          <Link href="/mastered" className="rounded-full bg-amber-200 px-6 py-2.5 font-medium text-black">
+            🏆 My mastered words
+          </Link>
+          <Link href="/" className="rounded-full border border-white/15 px-6 py-2.5 font-medium hover:bg-white/5">
+            Back home
+          </Link>
+        </div>
       </div>
     );
   }
@@ -153,23 +158,23 @@ export default function LessonRunner({
         <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 max-w-sm">
           <p className="text-sm text-zinc-400">
             {accuracy >= 80
-              ? "🌟 Strong recall — these words will surface in review spaced out over time."
+              ? "🌟 Strong recall — these words are locked in. You'll meet them again in the weekly test."
               : accuracy >= 60
-                ? "👍 Good start — review will strengthen what you missed."
-                : "📖 Review will help — you'll see these again soon."}
+                ? "👍 Good start — the weekly test will lock them in."
+                : "📖 Don't worry — the weekly test will bring these back."}
           </p>
         </div>
         <div className="flex flex-wrap justify-center gap-3">
           {(doneFooter ?? [
             { href: "/read", label: "📖 Reading challenge" },
-            { href: "/review", label: "Start review" },
+            { href: "/mastered", label: "🏆 Mastered words" },
             { href: "/", label: "Back home" },
           ]).map((f) => (
             <Link
               key={f.href + f.label}
               href={f.href}
               className={
-                f.href === "/review"
+                f.href === "/mastered"
                   ? "rounded-full bg-amber-200 px-6 py-2.5 font-medium text-black"
                   : "rounded-full border border-white/15 px-6 py-2.5 font-medium hover:bg-white/5"
               }
@@ -355,7 +360,7 @@ export default function LessonRunner({
 
             <div className="flex justify-between items-center">
               <span className="text-xs text-zinc-600">
-                {showTestResult && selectedAnswer !== item.correct && "You'll see this again in review"}
+                {showTestResult && selectedAnswer !== item.correct && "You'll see this again in the weekly test"}
               </span>
               <button
                 type="button"

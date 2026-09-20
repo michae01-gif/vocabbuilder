@@ -26,6 +26,7 @@ import { spinWheelDb, claimQuestDb, buyItemDb, equipItemDb, incrementQuest, clai
 import { validateWriting, PASTE_PENALTY_COINS, PASTE_WARNINGS_LIMIT, PARAGRAPH_BONUS_COINS } from "./validate-writing";
 import { registerUsername as registerUsernameDb, updateLeaderboardScore } from "./leaderboard";
 import { advanceTutorialDb } from "./tutorial";
+import { weeklyTestStatus, createWeeklyTestRun, recordWeeklyTestAnswer } from "./weekly";
 
 const db = getDb();
 
@@ -41,6 +42,65 @@ export async function finishTutorialReading() {
   advanceTutorialDb(user.id, 2);
   revalidateAll();
   return { ok: true };
+}
+
+const WEEKLY_TEST_COINS_PER_CORRECT = 15;
+const WEEKLY_TEST_PERFECT_BONUS = 50;
+
+export async function submitWeeklyTest(answers: { wordId: number; correct: boolean }[]) {
+  const user = await requireUser();
+  const status = weeklyTestStatus(user.id);
+  if (status.taken) return { ok: false as const, reason: "already-taken" as const };
+  if (answers.length === 0) return { ok: false as const, reason: "empty" as const };
+
+  const runId = createWeeklyTestRun(user.id);
+  let correct = 0;
+  for (const a of answers) {
+    if (a.correct) correct++;
+    recordWeeklyTestAnswer(runId, user.id, a.wordId, !!a.correct);
+  }
+  const total = answers.length;
+  const coinsEarned =
+    correct * WEEKLY_TEST_COINS_PER_CORRECT +
+    (correct === total && total > 0 ? WEEKLY_TEST_PERFECT_BONUS : 0);
+
+  db.prepare(
+    "UPDATE weekly_test_runs SET completed_at = datetime('now'), correct_count = ?, total_count = ?, coins_earned = ? WHERE id = ?"
+  ).run(correct, total, coinsEarned, runId);
+  if (coinsEarned > 0) db.prepare("UPDATE users SET coins = coins + ? WHERE id = ?").run(coinsEarned, user.id);
+
+  trackEvent(user.id, "weekly_test_completed", { correct, total, coinsEarned });
+  touchStreak(user.id);
+  revalidateAll();
+  return { ok: true as const, coins: coinsEarned, correct, total };
+}
+
+export async function confirmMasteredWord(wordId: number) {
+  const user = await requireUser();
+  const p = progressForWord(user.id, wordId);
+  if (!p) return { ok: false as const };
+  db.prepare(
+    "INSERT INTO review_logs (user_id, word_id, rating, task_type) VALUES (?, ?, ?, ?)"
+  ).run(user.id, wordId, RATINGS.Good, "mastered_quiz");
+  trackEvent(user.id, "mastered_confirmed", { wordId });
+  revalidateAll();
+  return { ok: true as const };
+}
+
+export async function demoteMasteredWord(wordId: number) {
+  const user = await requireUser();
+  const p = progressForWord(user.id, wordId);
+  if (!p) return { ok: false as const };
+  const now = new Date().toISOString();
+  db.prepare(
+    "UPDATE progress SET state = 1, due = ?, mastered_at = NULL, lapsed_at = ? WHERE id = ?"
+  ).run(now, now, p.id);
+  db.prepare(
+    "INSERT INTO review_logs (user_id, word_id, rating, task_type) VALUES (?, ?, ?, ?)"
+  ).run(user.id, wordId, RATINGS.Again, "mastered_quiz");
+  trackEvent(user.id, "mastered_demoted", { wordId });
+  revalidateAll();
+  return { ok: true as const, demoted: true as const };
 }
 
 export async function registerPasteWarning() {
@@ -345,7 +405,6 @@ export async function rateWord(wordId: number, rating: number, taskType: "recept
     taskType
   );
 
-  incrementQuest(user.id, "reviews");
 
   const xpGain = rating >= RATINGS.Good ? 4 : rating === RATINGS.Hard ? 2 : 0;
   if (xpGain > 0) db.prepare("UPDATE users SET xp = xp + ? WHERE id = ?").run(xpGain, user.id);

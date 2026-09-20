@@ -86,7 +86,7 @@ export default function SessionTutorial({
             <CoachMark avatar={avatar} label="Quick recall test" onContinue={() => setPause(null)}>
               <p>
                 Pick the word that fits each blank. Wrong answers aren&apos;t failures — they just come
-                back sooner on your review schedule. That&apos;s the system working!
+                back sooner in your next session and in the weekly test. That&apos;s the system working!
               </p>
             </CoachMark>
           )}
@@ -103,8 +103,8 @@ export default function SessionTutorial({
           <p>
             🎉 You just learned{" "}
             <span className="font-semibold text-amber-100">{summary?.total ?? words.length} words</span>{" "}
-            from DUC / DUCT — and they&apos;re on your smart-review schedule already. Next, let&apos;s
-            meet them alive in a real passage!
+            from DUC / DUCT — and your garden is growing already. Next, let&apos;s meet them alive in
+            a real passage!
           </p>
         </CoachMark>
       )}

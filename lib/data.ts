@@ -236,8 +236,8 @@ export function reviewLoad(userId: number): { due: number; newCap: number; messa
       .prepare("SELECT COUNT(*) AS n FROM progress WHERE user_id = ? AND due <= ?")
       .get(userId, new Date().toISOString()) as { n: number }
   ).n;
-  if (due >= 20) return { due, newCap: 1, message: "Big review backlog — learn just one new word today." };
-  if (due >= 12) return { due, newCap: 3, message: "Several reviews due — we'll keep new words light." };
+  if (due >= 20) return { due, newCap: 1, message: "A few words are due a recheck — learn just one new word today." };
+  if (due >= 12) return { due, newCap: 3, message: "Some words are due a recheck — we'll keep new words light." };
   return { due, newCap: 5, message: null };
 }
 
@@ -248,4 +248,41 @@ export function reviewsLastDays(userId: number, days = 14) {
     )
     .all(userId, new Date(Date.now() - days * 86400000).toISOString()) as { day: string; n: number }[];
   return rows;
+}
+
+export type MasteredWord = Word & {
+  root: string;
+  root_emoji: string;
+  root_meaning: string;
+  mastered_at: string;
+};
+
+export function masteredWordsList(userId: number): MasteredWord[] {
+  return db
+    .prepare(
+      `SELECT w.*, r.root AS root, r.emoji AS root_emoji, r.meaning AS root_meaning, p.mastered_at AS mastered_at
+       FROM progress p
+       JOIN words w ON w.id = p.word_id
+       JOIN roots r ON r.id = w.root_id
+       WHERE p.user_id = ? AND p.state = 2 AND p.mastered_at IS NOT NULL
+       ORDER BY p.mastered_at DESC, w.word`
+    )
+    .all(userId) as MasteredWord[];
+}
+
+export function masteredWordCount(userId: number): number {
+  return (
+    db
+      .prepare("SELECT COUNT(*) AS n FROM progress WHERE user_id = ? AND state = 2")
+      .get(userId) as { n: number }
+  ).n;
+}
+
+export function redoLearningWordIds(userId: number, limit = 5): number[] {
+  const rows = db
+    .prepare(
+      `SELECT word_id FROM progress WHERE user_id = ? AND state = 1 AND due <= ? ORDER BY due ASC LIMIT ?`
+    )
+    .all(userId, new Date().toISOString(), limit) as { word_id: number }[];
+  return rows.map((r) => r.word_id);
 }

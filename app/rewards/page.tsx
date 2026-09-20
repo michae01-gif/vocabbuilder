@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 
 export default async function RewardsPage() {
   const user = await requireUser();
-  const finished = advanceTutorialDb(user.id, 4);
+  const finished = advanceTutorialDb(user.id, 3);
   const owned = [...getOwnedItemIds(user.id)];
   const spunToday = user.last_spin_date === todayString();
   const coins = user.coins + (finished.completed ? finished.reward : 0);

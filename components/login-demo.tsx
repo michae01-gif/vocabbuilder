@@ -6,7 +6,7 @@ const SCENES: { ms: number; caption: string; render: () => ReactNode }[] = [
   { ms: 2600, caption: "1. Your home base — streak, coins, and where to start", render: () => <SceneHome /> },
   { ms: 2600, caption: "2. Read real passages — tap any word you don't know", render: () => <SceneTap /> },
   { ms: 2600, caption: "3. Learn the root family — one key, many words", render: () => <SceneRoot /> },
-  { ms: 2600, caption: "4. Smart review — words return right before you'd forget", render: () => <SceneReview /> },
+  { ms: 2600, caption: "4. Your garden grows as you master words", render: () => <SceneGarden /> },
   { ms: 2600, caption: "5. Coins earn you mascots, banners & themes", render: () => <SceneCoins /> },
   { ms: 2600, caption: "6. Spend them on your rewards page", render: () => <SceneRewards /> },
 ];
@@ -169,31 +169,28 @@ function SceneRoot() {
   );
 }
 
-/* ---- Scene 4: Review ---- */
-function SceneReview() {
-  const ratings = ["Again", "Hard", "Good", "Easy"];
+/* ---- Scene 4: Garden growth ---- */
+function SceneGarden() {
+  const trees = ["🌱", "🌿", "🌳", "🌳", "🌲"];
   return (
     <div className="flex h-full flex-col">
-      <p className="text-[10px] uppercase tracking-widest text-amber-200/70">Review · 12 due</p>
-      <div className="mt-1.5 rounded-xl border border-white/10 bg-white/[0.03] p-3 text-center" style={{ animation: "demo-card-in 0.5s ease both" }}>
-        <p className="font-[var(--font-lora)] text-lg font-bold text-amber-100">obsolete</p>
-        <p className="text-[11px] text-zinc-500">no longer in use</p>
-      </div>
-      <p className="mt-2 text-center text-[10px] uppercase tracking-widest text-zinc-600">How well do you know it?</p>
-      <div className="mt-1.5 grid grid-cols-4 gap-1.5">
-        {ratings.map((r) => (
+      <p className="text-[10px] uppercase tracking-widest text-amber-200/70">Your word garden</p>
+      <div className="mt-2 grid flex-1 grid-cols-5 items-end gap-1.5">
+        {trees.map((t, i) => (
           <div
-            key={r}
-            className={`rounded-lg border px-1 py-1.5 text-center text-[10px] ${
-              r === "Good" ? "text-emerald-200" : "text-zinc-400"
-            }`}
-            style={{ borderColor: "rgba(255,255,255,0.15)", ...(r === "Good" ? { animation: "demo-correct 2.6s ease both" } : {}) }}
+            key={i}
+            className="flex flex-col items-center justify-end gap-1 rounded-lg border border-white/10 bg-white/[0.03] pb-2 pt-3"
+            style={{ animation: `demo-rain 0.5s ease both ${0.2 + i * 0.22}s` }}
           >
-            {r}
+            <span className="text-xl">{t}</span>
           </div>
         ))}
       </div>
-      <p className="mt-auto text-[10px] text-zinc-500">Right answers space out — wrong ones return sooner</p>
+      <div className="mt-2 flex items-center justify-between rounded-lg border border-white/10 bg-white/[0.03] px-2.5 py-1.5" style={{ animation: "demo-pop 2.6s ease both" }}>
+        <span className="text-[11px] text-zinc-400">🌲 12 / 92 word families grown</span>
+        <span className="text-[11px] font-semibold text-emerald-300">132 words mastered</span>
+      </div>
+      <p className="mt-1.5 text-[10px] text-zinc-500">Each completed root family grows a tree</p>
     </div>
   );
 }

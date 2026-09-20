@@ -3,11 +3,10 @@ import { todayString } from "./data";
 import { WHEEL_SEGMENTS } from "@/data/wheel";
 import { SHOP_ITEMS, shopItemById } from "@/data/shop";
 
-export type QuestType = "learn_words" | "reviews" | "passages" | "sentences";
+export type QuestType = "learn_words" | "passages" | "sentences";
 
 export const QUEST_POOL: { type: QuestType; label: string; icon: string; target: number; reward: number }[] = [
   { type: "learn_words", label: "Learn 3 new words", icon: "🌱", target: 3, reward: 50 },
-  { type: "reviews", label: "Complete 10 reviews", icon: "🧠", target: 10, reward: 60 },
   { type: "passages", label: "Read 2 passages", icon: "📖", target: 2, reward: 80 },
   { type: "sentences", label: "Write 5 sentences", icon: "✍️", target: 5, reward: 40 },
 ];

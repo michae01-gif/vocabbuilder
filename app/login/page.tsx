@@ -40,7 +40,7 @@ export default function LoginPage() {
           <div className="flex flex-wrap justify-center gap-x-3.5 gap-y-1 text-[11px] text-zinc-600">
             <span>🔥 Streaks</span>
             <span>🪙 Coins</span>
-            <span>🌱 Smart review</span>
+            <span>🌱 A growing garden</span>
             <span>📖 Real passages</span>
           </div>
         </div>

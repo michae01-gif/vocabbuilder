@@ -153,21 +153,20 @@ export default function ReadingRunner({
     <CoachMark
       avatar={tutorialAvatar}
       label={bridge === "skip" ? "You knew them all!" : "Reading complete!"}
-      cta={pending ? "Saving…" : "Next: review words"}
+      cta={pending ? "Saving…" : "Next: spend your coins"}
       onContinue={continueTutorial}
     >
       <p>
         {bridge === "skip" ? (
           <>
-            Impressive — you knew every word in that passage! 🎉 Even so, the real test is{" "}
-            <span className="font-semibold text-amber-100">locking words into memory</span>. Review
-            brings each one back right before you&apos;d forget it.
+            Impressive — you knew every word in that passage! 🎉 Coins are piling up — let&apos;s go
+            see what they can buy: mascots, banners, and themes for your profile.
           </>
         ) : (
           <>
-            🎉 You just met your words alive in a real passage — that&apos;s how vocabulary sticks!
-            Now let&apos;s <span className="font-semibold text-amber-100">lock in what you
-            learned</span>: Review brings each word back right before you&apos;d forget it.
+            🎉 You just met your words alive in a real passage — and earned coins doing it! Now
+            let&apos;s <span className="font-semibold text-amber-100">spend your reward</span>:
+            mascots, banners, and themes await in the shop.
           </>
         )}
       </p>

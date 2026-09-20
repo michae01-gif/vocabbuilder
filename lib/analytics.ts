@@ -22,7 +22,10 @@ export type EventType =
   | "passage_read"
   | "spin_wheel"
   | "quest_claimed"
-  | "purchase_made";
+  | "purchase_made"
+  | "weekly_test_completed"
+  | "mastered_confirmed"
+  | "mastered_demoted";
 
 export function trackEvent(userId: number, eventType: EventType, eventData?: Record<string, unknown>) {
   db.prepare(

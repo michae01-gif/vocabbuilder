@@ -5,6 +5,7 @@ import { levelForWordCount } from "@/lib/types";
 import { nameStyle } from "@/data/shop";
 import { getTodayQuests, claimableRoots, ROOT_COMPLETION_REWARD } from "@/lib/rewards";
 import { getTutorialStepDb } from "@/lib/tutorial";
+import { weeklyTestStatus } from "@/lib/weekly";
 import Wheel from "@/components/wheel";
 import Quests from "@/components/quests";
 import Mascot from "@/components/mascot";
@@ -27,39 +28,39 @@ export default async function Home() {
   const z = (id: string) => (tutorial?.targetId === id ? "relative z-[80]" : "relative");
 
   const claimableQuests = quests.filter((q) => !q.claimed && q.progress >= q.target);
+  const weekly = weeklyTestStatus(user.id);
 
-  const overdue =
-    stats.due > 0
+  const overdue = !doneForToday
+    ? {
+        href: "/session",
+        icon: "🌱",
+        title: "Today's session is waiting",
+        sub: `“${root.root}” — ${fresh.length} new word${fresh.length === 1 ? "" : "s"} ready to unlock`,
+        cta: "Start session",
+        accent: "border-amber-200/50 hover:border-amber-200/80 from-amber-200/15",
+        btn: "bg-amber-200",
+      }
+    : weekly.eligible > 0
       ? {
-          href: "/review",
-          icon: "🔄",
-          title: `${stats.due} review${stats.due === 1 ? "" : "s"} overdue`,
-          sub: "Your words are slipping — lock them back in now",
-          cta: "Review now",
-          accent: "border-rose-400/50 hover:border-rose-400/80 from-rose-400/15",
-          btn: "bg-rose-400",
+          href: "/weekly-test",
+          icon: "🧪",
+          title: `Weekly test ready — ${weekly.eligible} missed word${weekly.eligible === 1 ? "" : "s"} to reset`,
+          sub: "One shot every week. Get them right to lock the words in and bank coins.",
+          cta: "Take weekly test",
+          accent: "border-sky-300/50 hover:border-sky-300/80 from-sky-300/15",
+          btn: "bg-sky-300",
         }
-      : !doneForToday
-        ? {
-            href: "/session",
-            icon: "🌱",
-            title: "Today's session is waiting",
-            sub: `“${root.root}” — ${fresh.length} new word${fresh.length === 1 ? "" : "s"} ready to unlock`,
-            cta: "Start session",
-            accent: "border-amber-200/50 hover:border-amber-200/80 from-amber-200/15",
-            btn: "bg-amber-200",
-          }
-        : claimableQuests.length > 0
-          ? {
-              href: "/rewards",
-              icon: "🎁",
-              title: `${claimableQuests.length} quest reward${claimableQuests.length === 1 ? "" : "s"} unclaimed`,
-              sub: "You finished the work — collect your coins",
-              cta: "Claim rewards",
-              accent: "border-emerald-300/50 hover:border-emerald-300/80 from-emerald-300/15",
-              btn: "bg-emerald-300",
-            }
-          : null;
+      : claimableQuests.length > 0
+      ? {
+          href: "/rewards",
+          icon: "🎁",
+          title: `${claimableQuests.length} quest reward${claimableQuests.length === 1 ? "" : "s"} unclaimed`,
+          sub: "You finished the work — collect your coins",
+          cta: "Claim rewards",
+          accent: "border-emerald-300/50 hover:border-emerald-300/80 from-emerald-300/15",
+          btn: "bg-emerald-300",
+        }
+      : null;
 
   return (
     <div className="space-y-6">
@@ -127,7 +128,7 @@ export default async function Home() {
           </span>
         </div>
 
-        <div className="grid gap-3 lg:grid-cols-[1.35fr_1fr_1fr_1fr]">
+        <div className="grid gap-3 lg:grid-cols-[1.35fr_1fr_1fr]">
           {/* Primary: today's session */}
           <Link
             id="tutorial-session"
@@ -166,27 +167,6 @@ export default async function Home() {
               <p className="text-[11px] font-semibold uppercase tracking-widest text-violet-300/80">Read</p>
               <h3 className="mt-0.5 font-[var(--font-lora)] text-lg font-semibold leading-tight">A passage with your words</h3>
               <p className="mt-1 text-[12px] font-medium text-violet-300 group-hover:underline">Read a passage →</p>
-            </div>
-          </Link>
-
-          {/* Secondary: review */}
-          <Link
-            id="tutorial-review"
-            href="/review"
-            className={`group flex flex-col justify-between gap-3 rounded-2xl border border-emerald-300/30 bg-gradient-to-br from-emerald-300/15 to-transparent p-5 transition-all hover:border-emerald-300/60 ${z("tutorial-review")}`}
-          >
-            <div className="flex items-start justify-between">
-              <span className="text-2xl">🔄</span>
-              {stats.due > 0 && (
-                <span className="rounded-full bg-emerald-300/20 px-2 py-0.5 text-[11px] font-bold text-emerald-300">
-                  {stats.due} due
-                </span>
-              )}
-            </div>
-            <div>
-              <p className="text-[11px] font-semibold uppercase tracking-widest text-emerald-300/80">Review</p>
-              <h3 className="mt-0.5 font-[var(--font-lora)] text-lg font-semibold leading-tight">Lock in what you learned</h3>
-              <p className="mt-1 text-[12px] font-medium text-emerald-300 group-hover:underline">Review words →</p>
             </div>
           </Link>
 

@@ -183,8 +183,30 @@ export function initSchema() {
       expires_at TEXT NOT NULL
     );
 
+    CREATE TABLE IF NOT EXISTS weekly_test_runs (
+      id INTEGER PRIMARY KEY,
+      user_id INTEGER NOT NULL REFERENCES users(id),
+      week_start TEXT NOT NULL,
+      completed_at TEXT,
+      correct_count INTEGER NOT NULL DEFAULT 0,
+      total_count INTEGER NOT NULL DEFAULT 0,
+      coins_earned INTEGER NOT NULL DEFAULT 0,
+      UNIQUE(user_id, week_start)
+    );
+
+    CREATE TABLE IF NOT EXISTS weekly_test_results (
+      id INTEGER PRIMARY KEY,
+      run_id INTEGER NOT NULL REFERENCES weekly_test_runs(id),
+      user_id INTEGER NOT NULL REFERENCES users(id),
+      word_id INTEGER NOT NULL REFERENCES words(id),
+      correct INTEGER NOT NULL DEFAULT 0,
+      tested_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+
     CREATE INDEX IF NOT EXISTS idx_progress_due ON progress(due);
     CREATE INDEX IF NOT EXISTS idx_words_root ON words(root_id);
+    CREATE INDEX IF NOT EXISTS idx_review_logs_user ON review_logs(user_id);
+    CREATE INDEX IF NOT EXISTS idx_wtr_user ON weekly_test_results(user_id);
   `);
 
   migrateProgress();

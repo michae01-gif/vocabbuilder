@@ -103,7 +103,7 @@ export default function TutorialGate({ def }: { def: TutorialStepDef }) {
             <div className="flex items-center gap-2">
               <span className="tutorial-bounce text-lg">👆</span>
               <p className="text-[10px] font-bold uppercase tracking-widest text-amber-200/80">
-                Step {def.step} of 4 · {def.title}
+                Step {def.step} of 3 · {def.title}
               </p>
             </div>
             <p className="mt-1.5 text-[13px] leading-snug text-zinc-200">{def.text}</p>
