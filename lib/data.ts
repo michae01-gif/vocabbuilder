@@ -22,9 +22,30 @@ export type User = {
   username: string | null;
   paste_warnings: number;
   grade: string | null;
+  start_root_idx: number;
 };
 
 const db = getDb();
+
+/** Where each grade band begins in the root progression (order_idx).
+ *  The sequence runs common/easy roots first, rarer/abstract ones later. */
+export const GRADE_START_IDX: Record<string, number> = {
+  "1-3": 0,
+  "4-6": 2,
+  "7-9": 10,
+  "10-12": 29,
+};
+
+export function startRootIdxForGrade(grade: string | null | undefined): number {
+  return GRADE_START_IDX[grade ?? ""] ?? 0;
+}
+
+export function userStartRootIdx(userId: number): number {
+  const row = db.prepare("SELECT start_root_idx AS s FROM users WHERE id = ?").get(userId) as
+    | { s?: number }
+    | undefined;
+  return row?.s ?? 0;
+}
 
 export function todayString(): string {
   return new Date().toLocaleDateString("en-CA");
@@ -73,7 +94,10 @@ export function userStats(userId: number) {
 
 export function currentRoot(userId: number): Root {
   const allRoots = db.prepare("SELECT * FROM roots ORDER BY order_idx").all() as Root[];
-  for (const root of allRoots) {
+  const n = allRoots.length;
+  const start = Math.min(Math.max(userStartRootIdx(userId), 0), Math.max(n - 1, 0));
+  const ordered = [...allRoots.slice(start), ...allRoots.slice(0, start)];
+  for (const root of ordered) {
     const total = (db.prepare("SELECT COUNT(*) AS n FROM words WHERE root_id = ?").get(root.id) as { n: number }).n;
     const done = (
       db
@@ -84,7 +108,7 @@ export function currentRoot(userId: number): Root {
     ).n;
     if (done < total) return root;
   }
-  return allRoots[allRoots.length - 1];
+  return allRoots[n - 1];
 }
 
 export function wordsForRoot(rootId: number): Word[] {

@@ -14,6 +14,7 @@ import {
   validateUsername,
   verifyPassword,
 } from "./auth";
+import { startRootIdxForGrade } from "./data";
 
 export async function signUpAction(username: string, password: string, grade: string | null = null) {
   const uname = username.trim();
@@ -22,14 +23,17 @@ export async function signUpAction(username: string, password: string, grade: st
   const pErr = validatePassword(password);
   if (pErr) return { ok: false as const, error: pErr };
   const gradeValue = grade && ["1-3", "4-6", "7-9", "10-12"].includes(grade) ? grade : null;
+  const startRootIdx = startRootIdxForGrade(gradeValue);
 
   const db = getDb();
   const taken = db.prepare("SELECT id FROM users WHERE username = ? COLLATE NOCASE").get(uname);
   if (taken) return { ok: false as const, error: "That username is already taken." };
 
   const info = db
-    .prepare("INSERT INTO users (name, username, password_hash, coins, tutorial_step, grade) VALUES (?, ?, ?, 100, 1, ?)")
-    .run(uname, uname, hashPassword(password), gradeValue);
+    .prepare(
+      "INSERT INTO users (name, username, password_hash, coins, tutorial_step, grade, start_root_idx) VALUES (?, ?, ?, 100, 1, ?, ?)"
+    )
+    .run(uname, uname, hashPassword(password), gradeValue, startRootIdx);
   const userId = Number(info.lastInsertRowid);
 
   const token = createSessionDb(userId);

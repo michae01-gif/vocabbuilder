@@ -54,7 +54,8 @@ export function initSchema() {
       xp INTEGER NOT NULL DEFAULT 0,
       streak INTEGER NOT NULL DEFAULT 0,
       last_study_date TEXT,
-      grade TEXT
+      grade TEXT,
+      start_root_idx INTEGER NOT NULL DEFAULT 0
     );
 
     CREATE TABLE IF NOT EXISTS progress (
@@ -307,6 +308,9 @@ function migrateUsers() {
   }
   if (!has("grade")) {
     tryAlter("ALTER TABLE users ADD COLUMN grade TEXT");
+  }
+  if (!has("start_root_idx")) {
+    tryAlter("ALTER TABLE users ADD COLUMN start_root_idx INTEGER NOT NULL DEFAULT 0");
   }
   db.exec("CREATE INDEX IF NOT EXISTS idx_users_username ON users(username)");
   db.exec("CREATE INDEX IF NOT EXISTS idx_auth_sessions_user ON auth_sessions(user_id)");
