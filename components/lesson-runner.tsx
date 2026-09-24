@@ -92,7 +92,7 @@ export default function LessonRunner({
     const errors: Record<number, string | null> = {};
     for (const w of words) {
       errors[w.id] = validateWriting(sentences[w.id] ?? "", {
-        minWords: 10,
+        minWords: 8,
         requireWord: w.word,
         label: "sentence",
       });
@@ -259,7 +259,7 @@ export default function LessonRunner({
         <div className="space-y-5">
           <h2 className="font-[var(--font-lora)] text-xl font-semibold">Use the words</h2>
           <p className="text-sm text-zinc-400">
-            Write a sentence using each word — at least <span className="text-amber-200">10 words</span>,
+            Write a sentence using each word — at least <span className="text-amber-200">8 words</span>,
             in your own words (any form of the word counts). Pasting is blocked: three warnings costs{" "}
             <span className="text-amber-200">500 🪙</span>.
           </p>

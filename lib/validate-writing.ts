@@ -31,7 +31,7 @@ export function validateWriting(
   text: string,
   opts: { minWords?: number; requireWord?: string; requireWords?: string[]; label?: string } = {}
 ): string | null {
-  const minWords = opts.minWords ?? 10;
+  const minWords = opts.minWords ?? 8;
   const label = opts.label ?? "sentence";
 
   const trimmed = text.trim();
