@@ -21,6 +21,7 @@ export type User = {
   background: string;
   username: string | null;
   paste_warnings: number;
+  grade: string | null;
 };
 
 const db = getDb();

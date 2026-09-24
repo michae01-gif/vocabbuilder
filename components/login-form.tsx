@@ -4,11 +4,19 @@ import { useState, useTransition } from "react";
 import { signInAction, signUpAction } from "@/lib/auth-actions";
 import { validateUsername } from "@/lib/validate";
 
+const GRADES = [
+  { value: "1-3", label: "Grades 1–3", hint: "ages 6–9" },
+  { value: "4-6", label: "Grades 4–6", hint: "ages 9–12" },
+  { value: "7-9", label: "Grades 7–9", hint: "ages 12–15" },
+  { value: "10-12", label: "Grades 10–12", hint: "ages 15–18" },
+];
+
 export default function LoginForm() {
   const [mode, setMode] = useState<"signin" | "signup">("signup");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
+  const [grade, setGrade] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
@@ -22,9 +30,15 @@ export default function LoginForm() {
       setError("Passwords do not match.");
       return;
     }
+    if (mode === "signup" && !grade) {
+      setError("Pick your grade to create your account.");
+      return;
+    }
     startTransition(async () => {
       const res =
-        mode === "signup" ? await signUpAction(username, password) : await signInAction(username, password);
+        mode === "signup"
+          ? await signUpAction(username, password, grade)
+          : await signInAction(username, password);
       if (res && !res.ok) setError(res.error);
     });
   }
@@ -99,6 +113,37 @@ export default function LoginForm() {
         </label>
       )}
 
+      {mode === "signup" && (
+        <fieldset className="space-y-1.5">
+          <legend className="text-xs uppercase tracking-widest text-zinc-500">
+            Your grade {grade && <span className="text-emerald-400">✓</span>}
+          </legend>
+          <div className="grid grid-cols-2 gap-2">
+            {GRADES.map((g) => (
+              <button
+                key={g.value}
+                type="button"
+                onClick={() => {
+                  setGrade(g.value);
+                  setError(null);
+                }}
+                aria-pressed={grade === g.value}
+                className={`rounded-xl border p-2.5 text-left transition-all active:scale-[0.98] ${
+                  grade === g.value
+                    ? "border-emerald-300/60 bg-emerald-300/10 shadow-[0_0_16px_rgba(110,231,183,0.12)]"
+                    : "border-white/15 bg-black/20 hover:border-amber-200/40"
+                }`}
+              >
+                <p className={`text-sm font-semibold ${grade === g.value ? "text-emerald-100" : "text-zinc-100"}`}>
+                  {g.label}
+                </p>
+                <p className="text-[10px] text-zinc-500">{g.hint}</p>
+              </button>
+            ))}
+          </div>
+        </fieldset>
+      )}
+
       {error && (
         <p className="rounded-xl border border-rose-400/30 bg-rose-400/10 px-4 py-2 text-sm text-rose-300">
           {error}
@@ -107,7 +152,7 @@ export default function LoginForm() {
 
       <button
         type="submit"
-        disabled={pending || username.length === 0 || password.length === 0}
+        disabled={pending || username.length === 0 || password.length === 0 || (mode === "signup" && !grade)}
         className="w-full rounded-xl bg-amber-200 py-3 font-semibold text-black transition-all hover:bg-amber-100 disabled:opacity-40"
       >
         {pending ? "Forging…" : mode === "signup" ? "Start forging →" : "Sign in →"}
