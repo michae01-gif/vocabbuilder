@@ -2,8 +2,8 @@
 
 import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
-import { completeWordBatch } from "@/lib/actions";
-import type { LessonWord } from "@/lib/reading";
+import { completeWordBatch, completeQuickCheck } from "@/lib/actions";
+import type { LessonWord, QuickCheckItem } from "@/lib/reading";
 import { validateWriting } from "@/lib/validate-writing";
 import SpeakButton from "./speak-button";
 import GuardedTextarea from "./guarded-textarea";
@@ -36,6 +36,8 @@ export default function LessonRunner({
   initial,
   onProgress,
   onComplete,
+  quickCheck,
+  hideQuickCheck,
 }: {
   words: LessonWord[];
   header: LessonHeader;
@@ -44,6 +46,8 @@ export default function LessonRunner({
   initial?: LessonProgress;
   onProgress?: (progress: LessonProgress) => void;
   onComplete?: (summary: { correct: number; total: number }) => void;
+  quickCheck?: QuickCheckItem[];
+  hideQuickCheck?: boolean;
 }) {
   const [phase, setPhase] = useState<Phase>(initial?.phase ?? "teach");
   const [sentences, setSentences] = useState<Record<number, string>>(initial?.sentences ?? {});
@@ -54,6 +58,12 @@ export default function LessonRunner({
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [showTestResult, setShowTestResult] = useState(false);
   const [pending, startTransition] = useTransition();
+  const [quickOpen, setQuickOpen] = useState(false);
+  const [quickIdx, setQuickIdx] = useState(0);
+  const [quickPicked, setQuickPicked] = useState<string | null>(null);
+  const [quickRevealed, setQuickRevealed] = useState(false);
+  const [quickResults, setQuickResults] = useState<{ wordId: number; correct: boolean }[]>([]);
+  const [quickCompleted, setQuickCompleted] = useState(false);
 
   useEffect(() => {
     if (!onProgress || phase === "done") return;
@@ -132,6 +142,46 @@ export default function LessonRunner({
     setShowTestResult(false);
   }
 
+  function openQuickCheck() {
+    setQuickOpen(true);
+    setQuickIdx(0);
+    setQuickPicked(null);
+    setQuickRevealed(false);
+    setQuickResults([]);
+    setQuickCompleted(false);
+  }
+
+  function pickQuick(opt: string) {
+    if (quickPicked) return;
+    setQuickPicked(opt);
+    setQuickRevealed(true);
+  }
+
+  function finishQuick(all: { wordId: number; correct: boolean }[]) {
+    startTransition(async () => {
+      await completeQuickCheck(all);
+      setPhase("done");
+      setQuickOpen(false);
+      setQuickCompleted(true);
+      onComplete?.({ correct: all.filter((r) => r.correct).length, total: all.length });
+    });
+  }
+
+  function handleNextQuick() {
+    if (!quickCheck) return;
+    const item = quickCheck[Math.min(quickIdx, quickCheck.length - 1)];
+    const result = { wordId: item.wordId, correct: quickPicked === item.correct };
+    const all = [...quickResults.filter((r) => r.wordId !== item.wordId), result];
+    setQuickResults(all);
+    if (quickIdx >= quickCheck.length - 1) {
+      finishQuick(all);
+      return;
+    }
+    setQuickIdx((i) => i + 1);
+    setQuickPicked(null);
+    setQuickRevealed(false);
+  }
+
   if (phase === "done") {
     const correct = testResults.filter((r) => r.correct).length;
     const accuracy = testItems.length > 0 ? Math.round((correct / testItems.length) * 100) : 100;
@@ -142,8 +192,18 @@ export default function LessonRunner({
         <p className="text-zinc-400">
           You learned{" "}
           <span className="text-zinc-200 font-semibold">{words.length}</span>{" "}
-          word{words.length === 1 ? "" : "s"} and scored{" "}
-          <span className="text-amber-200 font-semibold">{accuracy}%</span> on the recall test.
+          word{words.length === 1 ? "" : "s"}
+          {quickCompleted ? (
+            <>
+              {" "}with{" "}
+              <span className="text-amber-200 font-semibold">{accuracy}%</span> matching word meanings.
+            </>
+          ) : (
+            <>
+              {" "}and scored{" "}
+              <span className="text-amber-200 font-semibold">{accuracy}%</span> on the recall test.
+            </>
+          )}
         </p>
         <div className="flex flex-wrap justify-center gap-2">
           {words.map((w) => (
@@ -187,8 +247,80 @@ export default function LessonRunner({
     );
   }
 
+  if (quickOpen && quickCheck && quickCheck.length > 0) {
+    const item = quickCheck[Math.min(quickIdx, quickCheck.length - 1)];
+    const shuffled = shuffleStable(item.options, item.wordId);
+    return (
+      <div className="rise mx-auto max-w-3xl space-y-6">
+        <div className="flex items-center justify-center gap-3 text-xs">
+          <span className="text-emerald-300">⚡ Quick check</span>
+          <span className="text-zinc-600">·</span>
+          <span className="text-zinc-500">Question {quickIdx + 1} / {quickCheck.length}</span>
+        </div>
+
+        <div className="rounded-2xl border border-amber-200/30 bg-amber-200/10 px-6 py-8 text-center">
+          <p className="text-xs uppercase tracking-widest text-zinc-400">Which meaning matches this word?</p>
+          <h2 className="pop mt-2 font-[var(--font-lora)] text-4xl font-bold text-amber-100">{item.word}</h2>
+        </div>
+
+        <div className="grid gap-2 sm:grid-cols-2">
+          {shuffled.map((opt) => {
+            const chosen = quickPicked === opt;
+            const showCorrect = quickRevealed && opt === item.correct;
+            return (
+              <button
+                key={opt}
+                type="button"
+                onClick={() => pickQuick(opt)}
+                disabled={quickRevealed}
+                className={`rounded-xl border px-4 py-3 text-left text-sm transition-all ${
+                  showCorrect
+                    ? "border-emerald-300/60 bg-emerald-300/10 text-emerald-200"
+                    : chosen
+                      ? "border-rose-400/60 bg-rose-400/10 text-rose-200"
+                      : quickRevealed
+                        ? "border-white/10 bg-white/[0.02] text-zinc-500"
+                        : "border-white/15 text-zinc-200 hover:border-amber-200/50 hover:bg-amber-200/[0.06] hover:text-amber-100"
+                }`}
+              >
+                {opt}
+              </button>
+            );
+          })}
+        </div>
+
+        {quickRevealed && (
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={handleNextQuick}
+              disabled={pending}
+              className="rounded-full bg-amber-200 px-6 py-2.5 font-semibold text-black transition-all hover:bg-amber-100 disabled:opacity-50"
+            >
+              {pending ? "Finishing…" : quickIdx >= quickCheck.length - 1 ? "Finish lesson ✓" : "Next word →"}
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="rise mx-auto max-w-3xl space-y-6">
+      {/* Quick-complete button */}
+      {quickCheck && quickCheck.length > 0 && !hideQuickCheck && (phase === "produce" || phase === "test") && (
+        <button
+          type="button"
+          onClick={openQuickCheck}
+          className="w-full rounded-2xl border-2 border-amber-300/50 bg-amber-300/10 px-6 py-4 text-left transition-all hover:border-amber-200 hover:bg-amber-300/15"
+        >
+          <span className="text-xl font-bold text-amber-100">⚡ I already know all these words</span>
+          <span className="mt-0.5 block text-xs text-zinc-400">
+            Skip the writing — match each word to its meaning and lock this lesson in instantly.
+          </span>
+        </button>
+      )}
+
       {/* Phase indicator */}
       <div className="flex items-center justify-center gap-3 text-xs">
         {phase === "teach" && <span className="text-amber-200">📖 Learning</span>}

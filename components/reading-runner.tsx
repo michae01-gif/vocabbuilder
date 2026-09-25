@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { skipPassage, saveReadingState, clearReadingState, finishReadingPassage, finishTutorialReading } from "@/lib/actions";
 import LessonRunner from "./lesson-runner";
 import CoachMark from "./coach-mark";
-import type { LessonWord, VocabMatch } from "@/lib/reading";
+import type { LessonWord, VocabMatch, QuickCheckItem } from "@/lib/reading";
 import type { Passage } from "@/data/passages";
 
 export type ReadingInitial = {
@@ -28,6 +28,7 @@ export default function ReadingRunner({
   level,
   initial,
   tutorialAvatar,
+  quickCheck,
 }: {
   passage: Passage;
   matches: VocabMatch[];
@@ -36,6 +37,7 @@ export default function ReadingRunner({
   level: number;
   initial?: ReadingInitial;
   tutorialAvatar?: string;
+  quickCheck?: QuickCheckItem[];
 }) {
   const router = useRouter();
   const [selected, setSelected] = useState<Set<number>>(() => new Set(initial?.selectedIds ?? []));
@@ -216,6 +218,8 @@ export default function ReadingRunner({
           initial={initial?.lesson}
           onProgress={persistLesson}
           onComplete={handleLessonComplete}
+          quickCheck={quickCheck}
+          hideQuickCheck={!!tutorialAvatar}
         />
       </div>
     );

@@ -298,3 +298,26 @@ export function definitionMcqDb(wordIds: number[]): Record<number, string[]> {
   }
   return out;
 }
+
+export type QuickCheckItem = {
+  wordId: number;
+  word: string;
+  correct: string;
+  options: string[];
+};
+
+/** One 'match the word to its meaning' question per lesson word, using definitionMcqDb. */
+export function quickCheckQuiz(words: { id: number; word: string; definition: string }[]): QuickCheckItem[] {
+  const withDef = words
+    .map((w) => ({ id: w.id, word: w.word, definition: w.definition.trim() }))
+    .filter((w) => w.definition.length > 0);
+  const options = definitionMcqDb(withDef.map((w) => w.id));
+  return withDef
+    .map((w) => ({
+      wordId: w.id,
+      word: w.word,
+      correct: w.definition,
+      options: options[w.id] ?? [],
+    }))
+    .filter((q) => q.options.length >= 2);
+}

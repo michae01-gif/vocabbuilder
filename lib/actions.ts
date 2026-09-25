@@ -246,6 +246,61 @@ export async function completeWord(wordId: number, sentence: string, repaired = 
   return { ok: true, passed: passed === 1, feedback, score, maxScore: 20 };
 }
 
+export async function completeQuickCheck(results: { wordId: number; correct: boolean }[]) {
+  const user = await requireUser();
+  if (results.length === 0) return { ok: false as const };
+  for (const r of results) {
+    if (progressForWord(user.id, r.wordId)) {
+      rateWord(r.wordId, r.correct ? RATINGS.Good : RATINGS.Again, "productive");
+      continue;
+    }
+    trackEvent(user.id, "word_learned", { wordId: r.wordId });
+    const info = scheduleNew(r.correct ? RATINGS.Good : RATINGS.Again);
+    const c = info.card;
+    const now = new Date();
+    db.prepare(
+      `INSERT INTO progress (user_id, word_id, due, stability, difficulty, elapsed_days, scheduled_days, reps, lapses, state, last_review, stage,
+         productive_successes, receptive_successes, discrimination_successes, transfer_successes, production_passes, critical_error_open,
+         first_productive_at, last_productive_at, mastered_at, lapsed_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+    ).run(
+      user.id,
+      r.wordId,
+      c.due.toISOString(),
+      c.stability,
+      c.difficulty,
+      c.elapsed_days,
+      c.scheduled_days,
+      c.reps,
+      c.lapses,
+      c.state,
+      c.last_review ? c.last_review.toISOString() : null,
+      r.correct ? "recalled" : "recognised",
+      r.correct ? 1 : 0,
+      0,
+      0,
+      0,
+      0,
+      r.correct ? 0 : 1,
+      r.correct ? now.toISOString() : null,
+      r.correct ? now.toISOString() : null,
+      null,
+      null
+    );
+    db.prepare("INSERT INTO review_logs (user_id, word_id, rating, task_type) VALUES (?, ?, ?, ?)").run(
+      user.id,
+      r.wordId,
+      r.correct ? RATINGS.Good : RATINGS.Again,
+      "quick_check"
+    );
+    incrementQuest(user.id, "learn_words");
+    db.prepare("UPDATE users SET xp = xp + ? WHERE id = ?").run(r.correct ? 6 : 2, user.id);
+  }
+  touchStreak(user.id);
+  revalidateAll();
+  return { ok: true as const };
+}
+
 export async function completeWordBatch(wordId: number, sentence: string, testCorrect: boolean) {
   const user = await requireUser();
   if (progressForWord(user.id, wordId)) {

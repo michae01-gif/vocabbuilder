@@ -2,7 +2,7 @@ import { requireUser } from "@/lib/auth";
 import { currentRoot, newWordsForRoot, reviewLoad, redoLearningWordIds } from "@/lib/data";
 import LessonRunner from "@/components/lesson-runner";
 import SessionTutorial from "@/components/session-tutorial";
-import { lessonWordsByIds, distractorPool } from "@/lib/reading";
+import { lessonWordsByIds, distractorPool, quickCheckQuiz } from "@/lib/reading";
 import { trackEvent } from "@/lib/analytics";
 import { getTutorialStepDb } from "@/lib/tutorial";
 
@@ -35,6 +35,7 @@ export default async function SessionPage() {
         note: root.story,
       };
   const pool = distractorPool(user.id, words.map((w) => w.id), 40);
+  const quick = quickCheckQuiz(words);
 
   return (
     <div className="rise mx-auto max-w-3xl space-y-4">
@@ -53,7 +54,7 @@ export default async function SessionPage() {
       {tutorial?.step === 1 ? (
         <SessionTutorial words={words} pool={pool} header={header} avatar={user.avatar} />
       ) : (
-        <LessonRunner words={words} header={header} distractorPool={pool} />
+        <LessonRunner words={words} header={header} distractorPool={pool} quickCheck={quick} />
       )}
     </div>
   );

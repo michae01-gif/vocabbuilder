@@ -12,6 +12,7 @@ import {
 import ReadingRunner from "@/components/reading-runner";
 import SkipCheckpoint from "@/components/skip-checkpoint";
 import { getTutorialStepDb } from "@/lib/tutorial";
+import { quickCheckQuiz } from "@/lib/reading";
 
 export const dynamic = "force-dynamic";
 
@@ -64,6 +65,7 @@ export default async function ReadPage() {
       level={level}
       initial={initial}
       tutorialAvatar={tutorialAvatar}
+      quickCheck={quickCheckQuiz(words)}
     />
   );
 }
