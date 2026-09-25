@@ -84,7 +84,8 @@ export default function SkipCheckpoint({ questions, level }: { questions: Checkp
         </p>
         <h1 className="font-[var(--font-lora)] text-3xl font-bold">Prove you knew them 📝</h1>
         <p className="text-sm text-zinc-500">
-          You skipped 3 passages claiming you knew every word — match each word to its meaning to earn the bonus.
+          You skipped 3 passages claiming you knew every word — match each word to its meaning to keep
+          climbing tiers.
         </p>
       </header>
 
@@ -141,7 +142,7 @@ export default function SkipCheckpoint({ questions, level }: { questions: Checkp
               disabled={pending}
               className="rounded-full bg-amber-200 px-5 py-2 text-sm font-semibold text-black disabled:opacity-50"
             >
-              {pending ? "Claiming…" : idx + 1 >= total ? "Claim bonus 🪙" : "Next word →"}
+              {pending ? "Checking…" : idx + 1 >= total ? "Finish" : "Next word →"}
             </button>
           </div>
         )}

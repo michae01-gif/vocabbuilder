@@ -128,16 +128,10 @@ export function spinWheelDb(userId: number): { index: number; amount: number } |
 
 export const ROOT_COMPLETION_REWARD = 150;
 export const PASSAGE_COMPLETION_REWARD = 40;
-export const SKIP_CHECKPOINT_REWARD = 100;
 
 export function awardPassageCoinsDb(userId: number): number {
   getDb().prepare("UPDATE users SET coins = coins + ? WHERE id = ?").run(PASSAGE_COMPLETION_REWARD, userId);
   return PASSAGE_COMPLETION_REWARD;
-}
-
-export function awardSkipCheckpointCoinsDb(userId: number): number {
-  getDb().prepare("UPDATE users SET coins = coins + ? WHERE id = ?").run(SKIP_CHECKPOINT_REWARD, userId);
-  return SKIP_CHECKPOINT_REWARD;
 }
 
 export type ClaimableRoot = { rootId: number; root: string; emoji: string; wordCount: number };

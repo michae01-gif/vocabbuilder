@@ -22,7 +22,7 @@ import {
   SKIPS_PER_CHECKPOINT,
   type ReadingStateInput,
 } from "./reading";
-import { spinWheelDb, claimQuestDb, buyItemDb, equipItemDb, incrementQuest, claimRootDb, awardPassageCoinsDb, awardSkipCheckpointCoinsDb, PASSAGE_COMPLETION_REWARD, type QuestType } from "./rewards";
+import { spinWheelDb, claimQuestDb, buyItemDb, equipItemDb, incrementQuest, claimRootDb, awardPassageCoinsDb, PASSAGE_COMPLETION_REWARD, type QuestType } from "./rewards";
 import { validateWriting, PASTE_PENALTY_COINS, PASTE_WARNINGS_LIMIT, PARAGRAPH_BONUS_COINS } from "./validate-writing";
 import { registerUsername as registerUsernameDb, updateLeaderboardScore } from "./leaderboard";
 import { advanceTutorialDb } from "./tutorial";
@@ -428,7 +428,6 @@ export async function skipPassage(passageId: string) {
     logSkipDb(user.id, passageId, wordIds);
   }
   clearReadingStateDb(user.id);
-  incrementQuest(user.id, "passages");
   const current = user.reading_level ?? 1;
   const next = Math.min(MAX_READING_TIER, current + 1);
   db.prepare("UPDATE users SET reading_level = ? WHERE id = ?").run(next, user.id);
@@ -445,11 +444,10 @@ export async function completeSkipCheckpoint() {
   if (!getSkipCheckpointDb(user.id)) return { ok: false as const, error: "No checkpoint pending." };
   trackEvent(user.id, "passage_read", { checkpoint: true });
   completeSkipCheckpointDb(user.id);
-  const coins = awardSkipCheckpointCoinsDb(user.id);
   revalidatePath("/read");
   revalidatePath("/");
   revalidatePath("/rewards");
-  return { ok: true as const, coins };
+  return { ok: true as const, coins: 0 };
 }
 
 export async function finishReadingPassage() {

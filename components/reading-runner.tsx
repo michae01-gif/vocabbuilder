@@ -45,7 +45,7 @@ export default function ReadingRunner({
   const [pending, startTransition] = useTransition();
   const [skipNote, setSkipNote] = useState<string | null>(null);
   const [summary, setSummary] = useState<{ correct: number; total: number; coins: number } | null>(null);
-  const [bridge, setBridge] = useState<null | "lesson" | "skip">(null);
+  const [bridge, setBridge] = useState<null | "lesson">(null);
 
   const wordById = useMemo(() => {
     const m = new Map<number, LessonWord>();
@@ -115,18 +115,12 @@ export default function ReadingRunner({
       }
       setSelected(new Set());
       setSummary(null);
-      if (tutorialAvatar) {
-        setSkipNote(null);
-        setBridge("skip");
-        router.refresh();
-        return;
-      }
       const tierNote = res.capped
         ? "You're already at the highest tier — here's another summit-level passage."
         : `Moved up to tier ${res.level} — harder words await.`;
       const quizNote =
         !res.checkpoint && res.skipsUntilCheckpoint > 0
-          ? ` Skip-checkpoint quiz in ${res.skipsUntilCheckpoint} more skip${res.skipsUntilCheckpoint === 1 ? "" : "s"} — 100 🪙 bonus.`
+          ? ` Skip-checkpoint quiz in ${res.skipsUntilCheckpoint} more skip${res.skipsUntilCheckpoint === 1 ? "" : "s"}.`
           : "";
       setSkipNote(tierNote + quizNote);
       router.refresh();
@@ -149,29 +143,21 @@ export default function ReadingRunner({
     });
   }
 
-  const bridgeMark = tutorialAvatar && bridge ? (
-    <CoachMark
-      avatar={tutorialAvatar}
-      label={bridge === "skip" ? "You knew them all!" : "Reading complete!"}
-      cta={pending ? "Saving…" : "Next: spend your coins"}
-      onContinue={continueTutorial}
-    >
-      <p>
-        {bridge === "skip" ? (
-          <>
-            Impressive — you knew every word in that passage! 🎉 Coins are piling up — let&apos;s go
-            see what they can buy: mascots, banners, and themes for your profile.
-          </>
-        ) : (
-          <>
-            🎉 You just met your words alive in a real passage — and earned coins doing it! Now
-            let&apos;s <span className="font-semibold text-amber-100">spend your reward</span>:
-            mascots, banners, and themes await in the shop.
-          </>
-        )}
-      </p>
-    </CoachMark>
-  ) : null;
+  const bridgeMark =
+    tutorialAvatar && bridge === "lesson" ? (
+      <CoachMark
+        avatar={tutorialAvatar}
+        label="Reading complete!"
+        cta={pending ? "Saving…" : "Next: spend your coins"}
+        onContinue={continueTutorial}
+      >
+        <p>
+          🎉 You just met your words alive in a real passage — and earned coins doing it! Now let&apos;s{" "}
+          <span className="font-semibold text-amber-100">spend your reward</span>: mascots, banners, and themes
+          await in the shop.
+        </p>
+      </CoachMark>
+    ) : null;
 
   function nextPassage() {
     void clearReadingState();
@@ -317,14 +303,16 @@ export default function ReadingRunner({
       </div>
 
       <div className="flex flex-col gap-3 sm:flex-row">
-        <button
-          type="button"
-          onClick={handleSkip}
-          disabled={pending}
-          className="flex-1 rounded-xl border border-white/15 py-3 text-sm font-medium text-zinc-300 transition-colors hover:border-emerald-300/40 hover:text-emerald-200 disabled:opacity-50"
-        >
-          {pending ? "Forging a harder passage…" : "I knew all these words — harder passage →"}
-        </button>
+        {!tutorialAvatar && (
+          <button
+            type="button"
+            onClick={handleSkip}
+            disabled={pending}
+            className="flex-1 rounded-xl border border-white/15 py-3 text-sm font-medium text-zinc-300 transition-colors hover:border-emerald-300/40 hover:text-emerald-200 disabled:opacity-50"
+          >
+            {pending ? "Forging a harder passage…" : "I knew all these words — harder passage →"}
+          </button>
+        )}
         <button
           type="button"
           onClick={startLesson}
