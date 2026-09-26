@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { currentRoot, newWordsForRoot, reviewLoad, redoLearningWordIds } from "@/lib/data";
 import LessonRunner from "@/components/lesson-runner";
@@ -39,6 +40,30 @@ export default async function SessionPage() {
 
   return (
     <div className="rise mx-auto max-w-3xl space-y-4">
+      {tutorial?.step !== 1 && (
+        <Link
+          href="/read"
+          className="group flex items-center justify-between gap-4 rounded-2xl border-2 border-violet-300/50 bg-gradient-to-br from-violet-300/20 to-transparent p-5 shadow-lg shadow-violet-500/10 transition-all hover:border-violet-300/80"
+        >
+          <div className="flex min-w-0 items-center gap-4">
+            <span className="shrink-0 text-3xl sm:text-4xl">📖</span>
+            <div className="min-w-0">
+              <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-violet-300/80">
+                Learn a passage
+              </p>
+              <h2 className="mt-0.5 font-[var(--font-lora)] text-xl font-bold leading-tight sm:text-2xl">
+                Read your words in a real story
+              </h2>
+              <p className="mt-1 text-sm text-zinc-400">
+                Tap every word you recognize, then build a mini-lesson from them.
+              </p>
+            </div>
+          </div>
+          <span className="shrink-0 rounded-full bg-violet-300 px-4 py-2.5 text-sm font-bold text-black transition-transform group-hover:scale-105">
+            Start →
+          </span>
+        </Link>
+      )}
       {capped && (
         <p className="rounded-xl border border-amber-200/30 bg-amber-200/10 px-4 py-2.5 text-sm text-amber-200">
           {load.message ?? "We'll keep new words light today."}{" "}

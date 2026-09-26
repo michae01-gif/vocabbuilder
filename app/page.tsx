@@ -119,38 +119,38 @@ export default async function Home() {
         </section>
       )}
       {/* START HERE — the one obvious thing to do */}
-      <section className="space-y-3">
-        <div className="flex items-center gap-2.5">
-          <span className="text-lg">⚡</span>
-          <h2 className="text-sm font-bold uppercase tracking-[0.2em] text-amber-200">Start here</h2>
-          <span className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[11px] text-zinc-500">
+      <section className="space-y-4">
+        <div className="flex items-center gap-3">
+          <span className="text-2xl">⚡</span>
+          <h2 className="text-lg font-bold uppercase tracking-[0.2em] text-amber-200">Start here</h2>
+          <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs font-medium text-zinc-400">
             ~5 min
           </span>
         </div>
 
-        <div className="grid gap-3 lg:grid-cols-[1.35fr_1fr_1fr]">
+        <div className="grid gap-4 lg:grid-cols-[1.35fr_1fr_1fr]">
           {/* Primary: today's session */}
           <Link
             id="tutorial-session"
             href="/session"
-            className={`group flex flex-col justify-between gap-3 rounded-2xl bg-amber-200 p-5 text-black shadow-lg shadow-amber-200/20 transition-all hover:bg-amber-100 active:scale-[0.99] ${z("tutorial-session")}`}
+            className={`group flex flex-col justify-between gap-4 rounded-3xl bg-amber-200 p-7 text-black shadow-xl shadow-amber-200/25 transition-all hover:bg-amber-100 active:scale-[0.99] ${z("tutorial-session")}`}
           >
             <div className="flex items-start justify-between gap-2">
-              <span className="text-3xl">{root.emoji}</span>
+              <span className="text-4xl sm:text-5xl">{root.emoji}</span>
               {fresh.length > 0 && (
-                <span className="rounded-full bg-black/15 px-2 py-0.5 text-[11px] font-bold">
+                <span className="rounded-full bg-black/15 px-2.5 py-1 text-xs font-bold">
                   {fresh.length} new words
                 </span>
               )}
             </div>
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-widest text-black/60">
+              <p className="text-xs font-bold uppercase tracking-widest text-black/60">
                 {doneForToday ? "Next root" : "Today's session"}
               </p>
-              <h3 className="font-[var(--font-lora)] text-xl font-bold leading-tight">
+              <h3 className="mt-0.5 font-[var(--font-lora)] text-2xl font-bold leading-tight sm:text-[28px]">
                 {doneForToday ? `Explore “${root.root}”` : `Learn “${root.root}” — ${root.meaning}`}
               </h3>
-              <p className="mt-1 text-[13px] font-medium text-black/70 group-hover:underline">
+              <p className="mt-2 text-sm font-bold text-black/70 group-hover:underline">
                 ▶ START session →
               </p>
             </div>
@@ -160,13 +160,15 @@ export default async function Home() {
           <Link
             id="tutorial-read"
             href="/read"
-            className={`group flex flex-col justify-between gap-3 rounded-2xl border border-violet-300/30 bg-gradient-to-br from-violet-300/15 to-transparent p-5 transition-all hover:border-violet-300/60 ${z("tutorial-read")}`}
+            className={`group flex flex-col justify-between gap-4 rounded-3xl border border-violet-300/30 bg-gradient-to-br from-violet-300/15 to-transparent p-7 transition-all hover:border-violet-300/60 ${z("tutorial-read")}`}
           >
-            <span className="text-2xl">📖</span>
+            <span className="text-3xl sm:text-4xl">📖</span>
             <div>
-              <p className="text-[11px] font-semibold uppercase tracking-widest text-violet-300/80">Read</p>
-              <h3 className="mt-0.5 font-[var(--font-lora)] text-lg font-semibold leading-tight">A passage with your words</h3>
-              <p className="mt-1 text-[12px] font-medium text-violet-300 group-hover:underline">Read a passage →</p>
+              <p className="text-xs font-semibold uppercase tracking-widest text-violet-300/80">Read</p>
+              <h3 className="mt-0.5 font-[var(--font-lora)] text-xl font-semibold leading-tight sm:text-2xl">
+                A passage with your words
+              </h3>
+              <p className="mt-2 text-sm font-medium text-violet-300 group-hover:underline">Read a passage →</p>
             </div>
           </Link>
 
@@ -174,21 +176,43 @@ export default async function Home() {
           <Link
             id="tutorial-rewards"
             href="/rewards"
-            className={`group flex flex-col justify-between gap-3 rounded-2xl border border-white/15 bg-gradient-to-br from-white/[0.07] to-transparent p-5 transition-all hover:border-amber-200/40 ${z("tutorial-rewards")}`}
+            className={`group flex flex-col justify-between gap-4 rounded-3xl border border-white/15 bg-gradient-to-br from-white/[0.07] to-transparent p-7 transition-all hover:border-amber-200/40 ${z("tutorial-rewards")}`}
           >
             <div className="flex items-start justify-between">
-              <span className="text-2xl">🪙</span>
-              <span className="rounded-full border border-amber-200/30 bg-amber-200/10 px-2 py-0.5 text-[11px] font-bold text-amber-200">
+              <span className="text-3xl sm:text-4xl">🪙</span>
+              <span className="rounded-full border border-amber-200/30 bg-amber-200/10 px-2.5 py-1 text-xs font-bold text-amber-200">
                 {user.coins}
               </span>
             </div>
             <div>
-              <p className="text-[11px] font-semibold uppercase tracking-widest text-amber-200/70">Rewards</p>
-              <h3 className="mt-0.5 font-[var(--font-lora)] text-lg font-semibold leading-tight">Spend coins on mascots &amp; themes</h3>
-              <p className="mt-1 text-[12px] font-medium text-amber-200/90 group-hover:underline">Open shop →</p>
+              <p className="text-xs font-semibold uppercase tracking-widest text-amber-200/70">Rewards</p>
+              <h3 className="mt-0.5 font-[var(--font-lora)] text-xl font-semibold leading-tight sm:text-2xl">
+                Spend coins on mascots &amp; themes
+              </h3>
+              <p className="mt-2 text-sm font-medium text-amber-200/90 group-hover:underline">Open shop →</p>
             </div>
           </Link>
         </div>
+
+        {/* MASSIVE passage CTA */}
+        <Link
+          href="/read"
+          className="group relative flex flex-col items-center justify-center gap-3 overflow-hidden rounded-3xl border-4 border-violet-300/70 bg-gradient-to-br from-violet-400/25 via-violet-500/15 to-fuchsia-500/10 px-6 py-12 text-center shadow-2xl shadow-violet-500/20 transition-all hover:border-violet-300 hover:from-violet-400/35 hover:via-violet-500/25 hover:to-fuchsia-500/20 active:scale-[0.995] sm:py-16"
+        >
+          <span className="text-5xl sm:text-6xl">📖</span>
+          <span className="text-xs font-bold uppercase tracking-[0.35em] text-violet-200/80">
+            Reading
+          </span>
+          <span className="font-[var(--font-lora)] text-4xl font-bold leading-none text-white sm:text-6xl">
+            START A PASSAGE
+          </span>
+          <span className="max-w-md text-sm text-zinc-300 sm:text-base">
+            Meet your words alive in a real passage — tap each one you recognize.
+          </span>
+          <span className="mt-1 rounded-full bg-violet-300 px-7 py-3 text-base font-bold text-black transition-transform group-hover:scale-105 sm:text-lg">
+            Start reading →
+          </span>
+        </Link>
       </section>
 
       {/* Daily rewards: wheel + quests (demoted below the fold) */}
