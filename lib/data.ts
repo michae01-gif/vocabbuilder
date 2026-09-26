@@ -131,40 +131,6 @@ export function newWordsBatch(userId: number, rootId: number, limit = 5): Word[]
     .all(rootId, userId, limit) as Word[];
 }
 
-export function masteredWordsForRoot(userId: number, rootId: number): Word[] {
-  return db
-    .prepare(
-      `SELECT w.* FROM words w JOIN progress p ON p.word_id = w.id AND p.user_id = ? WHERE w.root_id = ? AND p.state = 2`
-    )
-    .all(userId, rootId) as Word[];
-}
-
-export function dueReviews(userId: number, limit = 40): (Progress & Word & {
-  root: string;
-  root_emoji: string;
-  root_meaning: string;
-  task_type: "receptive" | "productive";
-})[] {
-  const rows = db
-    .prepare(
-      `SELECT p.*, w.* FROM progress p
-       JOIN words w ON w.id = p.word_id
-       JOIN roots r ON r.id = w.root_id
-       WHERE p.user_id = ? AND p.due <= ?
-       ORDER BY p.due ASC
-       LIMIT ?`
-    )
-    .all(userId, new Date().toISOString(), limit) as (Progress & Word & {
-    root: string;
-    root_emoji: string;
-    root_meaning: string;
-  })[];
-  return rows.map((row, i) => ({
-    ...row,
-    task_type: i % 2 === 0 ? "productive" : "receptive",
-  }));
-}
-
 export function duelForWord(userId: number, wordId: number): DuelWithWords | undefined {
   const duel = db
     .prepare(
@@ -302,16 +268,24 @@ export function masteredWordsList(userId: number): MasteredWord[] {
 export function masteredWordCount(userId: number): number {
   return (
     db
-      .prepare("SELECT COUNT(*) AS n FROM progress WHERE user_id = ? AND state = 2")
+      .prepare("SELECT COUNT(*) AS n FROM progress WHERE user_id = ? AND state = 2 AND mastered_at IS NOT NULL")
       .get(userId) as { n: number }
   ).n;
 }
 
 export function redoLearningWordIds(userId: number, limit = 5): number[] {
+  // Words the user marked forgotten (lapsed/demoted) come back same-day and first;
+  // fresh learning-state words only rejoin the queue the day after they were learned,
+  // so a lesson you just finished never displaces genuinely forgotten words.
+  const startOfToday = new Date(`${todayString()}T00:00:00`).toISOString();
   const rows = db
     .prepare(
-      `SELECT word_id FROM progress WHERE user_id = ? AND state = 1 AND due <= ? ORDER BY due ASC LIMIT ?`
+      `SELECT word_id FROM progress
+       WHERE user_id = ? AND due <= ?
+         AND (state = 3 OR (state = 1 AND (lapsed_at IS NOT NULL OR last_review < ?)))
+       ORDER BY (lapsed_at IS NULL) ASC, due ASC
+       LIMIT ?`
     )
-    .all(userId, new Date().toISOString(), limit) as { word_id: number }[];
+    .all(userId, new Date().toISOString(), startOfToday, limit) as { word_id: number }[];
   return rows.map((r) => r.word_id);
 }

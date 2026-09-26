@@ -5,9 +5,10 @@ export type RatingValue = Rating;
 
 const fsrs = new FSRS();
 
-function today(): Date {
-  const now = new Date();
-  return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+function now(): Date {
+  // Anchor scheduling at the real review time (not midnight) so intraday
+  // learning steps land in the future and due <= now checks stay honest.
+  return new Date();
 }
 
 export function newCard(): Card {
@@ -15,7 +16,7 @@ export function newCard(): Card {
 }
 
 export function scheduleNew(rating: Rating = Rating.Good): SchedulingInfo {
-  return fsrs.repeat(newCard(), today())[rating];
+  return fsrs.repeat(newCard(), now())[rating];
 }
 
 export function progressToCard(p: Progress): Card {
@@ -56,7 +57,7 @@ export function review(p: Progress, rating: Rating): Pick<
   "due" | "stability" | "difficulty" | "elapsed_days" | "scheduled_days" | "reps" | "lapses" | "state" | "last_review"
 > {
   const card = progressToCard(p);
-  const info = fsrs.repeat(card, today())[rating];
+  const info = fsrs.repeat(card, now())[rating];
   return cardToProgress(info.card);
 }
 

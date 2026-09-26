@@ -93,8 +93,8 @@ export async function demoteMasteredWord(wordId: number) {
   if (!p) return { ok: false as const };
   const now = new Date().toISOString();
   db.prepare(
-    "UPDATE progress SET state = 1, due = ?, mastered_at = NULL, lapsed_at = ? WHERE id = ?"
-  ).run(now, now, p.id);
+    "UPDATE progress SET state = 1, due = ?, last_review = ?, mastered_at = NULL, lapsed_at = ? WHERE id = ?"
+  ).run(now, now, now, p.id);
   db.prepare(
     "INSERT INTO review_logs (user_id, word_id, rating, task_type) VALUES (?, ?, ?, ?)"
   ).run(user.id, wordId, RATINGS.Again, "mastered_quiz");
