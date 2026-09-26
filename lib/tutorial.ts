@@ -16,21 +16,21 @@ export const TUTORIAL_STEPS: TutorialStepDef[] = [
     targetId: "tutorial-session",
     href: "/session",
     title: "Start today's session",
-    text: "Every day starts with one short root lesson. Tap the golden START button to forge your first words.",
+    text: "Every day starts with one short root lesson. Tap the golden START SESSION button to forge your first words.",
   },
   {
     step: 2,
     targetId: "tutorial-read",
     href: "/read",
     title: "Read your first passage",
-    text: "Now see your words alive in real writing — tap READ PASSAGE.",
+    text: "Now see your words alive in real writing — tap START A PASSAGE.",
   },
   {
     step: 3,
     targetId: "tutorial-rewards",
     href: "/rewards",
     title: "See what coins can buy",
-    text: "Mascots, banners, themes — tap REWARDS to open the shop.",
+    text: "Mascots, banners, themes — tap the Rewards shop pill to spend your coins.",
   },
 ];
 

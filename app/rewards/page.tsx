@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { todayString } from "@/lib/data";
-import { getOwnedItemIds } from "@/lib/rewards";
+import { getOwnedItemIds, getTodayQuests } from "@/lib/rewards";
 import { advanceTutorialDb } from "@/lib/tutorial";
 import Wheel from "@/components/wheel";
 import Shop from "@/components/shop";
+import Quests from "@/components/quests";
 
 export const dynamic = "force-dynamic";
 
@@ -14,6 +15,7 @@ export default async function RewardsPage() {
   const owned = [...getOwnedItemIds(user.id)];
   const spunToday = user.last_spin_date === todayString();
   const coins = user.coins + (finished.completed ? finished.reward : 0);
+  const quests = getTodayQuests(user.id);
 
   return (
     <div className="rise space-y-6">
@@ -44,6 +46,8 @@ export default async function RewardsPage() {
       <div className="mx-auto max-w-md">
         <Wheel coins={coins} spunToday={spunToday} avatar={user.avatar} />
       </div>
+
+      <Quests quests={quests} />
 
       <Shop
         coins={coins}
