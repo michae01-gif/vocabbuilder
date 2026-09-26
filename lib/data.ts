@@ -236,15 +236,6 @@ export function reviewLoad(userId: number): { due: number; newCap: number; messa
   return { due, newCap: 5, message: null };
 }
 
-export function reviewsLastDays(userId: number, days = 14) {
-  const rows = db
-    .prepare(
-      `SELECT date(reviewed_at) AS day, COUNT(*) AS n FROM review_logs WHERE user_id = ? AND reviewed_at >= ? GROUP BY day`
-    )
-    .all(userId, new Date(Date.now() - days * 86400000).toISOString()) as { day: string; n: number }[];
-  return rows;
-}
-
 export type MasteredWord = Word & {
   root: string;
   root_emoji: string;

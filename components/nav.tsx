@@ -11,7 +11,6 @@ const links = [
   { href: "/garden", label: "Garden", treeBadge: true },
   { href: "/leaderboard", label: "Ranks" },
   { href: "/mastered", label: "Mastered" },
-  { href: "/stats", label: "Stats" },
   { href: "/rewards", label: "Rewards" },
 ];
 

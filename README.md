@@ -43,7 +43,7 @@ Open [http://localhost:3000](http://localhost:3000). The SQLite database is crea
 ## Project layout
 
 ```
-app/            dashboard, session, read, garden, stats, mastered, weekly-test pages
+app/            dashboard, session, read, garden, mastered, rewards, weekly-test pages
 components/     session + mastered runners, speak button, nav
 data/           seed content (roots × words)
 lib/            db, data queries, server actions, stage logic, evaluator, FSRS helpers, seed loader

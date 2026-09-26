@@ -155,7 +155,6 @@ function revalidateAll() {
   revalidatePath("/");
   revalidatePath("/session");
   revalidatePath("/garden");
-  revalidatePath("/stats");
   revalidatePath("/rewards");
   revalidatePath("/leaderboard");
   revalidatePath("/mastered");
