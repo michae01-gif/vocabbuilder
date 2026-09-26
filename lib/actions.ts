@@ -173,6 +173,7 @@ export async function completeWord(wordId: number, sentence: string, repaired = 
   const word = db.prepare("SELECT * FROM words WHERE id = ?").get(wordId) as {
     word: string;
     definition: string;
+    pos: string;
     example1: string;
     example2: string;
     example3: string;
@@ -187,6 +188,7 @@ export async function completeWord(wordId: number, sentence: string, repaired = 
       word: word.word,
       definition: word.definition,
       examples: [word.example1, word.example2, word.example3],
+      pos: word.pos,
     });
     passed = verdict.passed ? 1 : 0;
     issues = verdict.issues.join(" · ");
@@ -317,6 +319,7 @@ export async function completeWordBatch(wordId: number, sentence: string, testCo
   const word = db.prepare("SELECT * FROM words WHERE id = ?").get(wordId) as {
     word: string;
     definition: string;
+    pos: string;
     example1: string;
     example2: string;
     example3: string;
@@ -330,6 +333,7 @@ export async function completeWordBatch(wordId: number, sentence: string, testCo
       word: word.word,
       definition: word.definition,
       examples: [word.example1, word.example2, word.example3],
+      pos: word.pos,
     });
     passed = verdict.passed ? 1 : 0;
     issues = verdict.issues.join(" · ");

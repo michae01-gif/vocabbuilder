@@ -1,9 +1,11 @@
 import type { ProductionVerdict } from "./types";
+import { sentenceStructure } from "./sentence-sense";
 
 type WordInfo = {
   word: string;
   definition: string;
   examples: string[];
+  pos?: string;
 };
 
 const STOP = new Set(["a", "an", "the", "and", "or", "but", "of", "to", "in", "on", "for", "with", "at", "by", "is", "are", "was", "were", "be", "been", "being", "it", "its", "this", "that", "these", "those", "i", "you", "he", "she", "they", "we", "my", "your", "his", "her", "their", "our", "me", "him", "them", "us", "from", "as", "so", "if", "then", "than", "when", "which", "who", "whom", "where", "why", "how", "have", "has", "had", "do", "does", "did", "not", "no", "will", "would", "can", "could", "may", "might", "must", "shall", "should", "there", "here", "all", "some", "any", "each", "every", "one", "two", "more", "most", "other", "also", "just", "very", "like", "about"]);
@@ -115,16 +117,21 @@ export function evaluateSentence(sentence: string, info: WordInfo): ProductionVe
     issues.push("Start with a capital letter and end with a punctuation mark.");
   }
 
+  const structure = sentenceStructure(tokenize(trimmed), info.pos?.toLowerCase().includes("verb") ? inflections(info.word) : []);
+  if (!structure.ok) {
+    issues.push("This doesn't read like a real sentence — it looks like random words.");
+  }
+
   const semantic = used ? 4 : 1;
   const collocation = used && !copy ? 3 : used ? 2 : 1;
   const grammar = startsCap && endsPunct ? 3 : 2;
   const register = 3;
-  const naturalness = used && !copy && words.length >= 3 ? 4 : 2;
+  const naturalness = used && !copy && words.length >= 3 && structure.ok ? 4 : structure.ok ? 2 : 1;
   const contribution = used && words.length >= 4 ? 2 : 1;
 
   const score = semantic + collocation + grammar + register + naturalness + contribution;
   const critical = !used;
-  const passed = score >= 15 && semantic >= 3 && !critical && !copy;
+  const passed = score >= 15 && semantic >= 3 && !critical && !copy && structure.ok;
 
   let feedback: string;
   if (passed) {
@@ -133,6 +140,8 @@ export function evaluateSentence(sentence: string, info: WordInfo): ProductionVe
     feedback = `Rewrite the sentence so that “${info.word}” (${info.definition}) actually appears and does the work.`;
   } else if (copy) {
     feedback = `This is too close to the example. Write a fresh sentence of your own using “${info.word}”.`;
+  } else if (!structure.ok) {
+    feedback = `That reads like random words, not a real sentence. Write genuine English using “${info.word}”.`;
   } else {
     feedback = issues[0] ?? "Revise the sentence and try again.";
   }

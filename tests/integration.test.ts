@@ -46,7 +46,7 @@ async function main() {
   const tutorial = await import("../lib/tutorial");
   const { hashPassword, verifyPassword } = await import("../lib/auth");
   const { validateUsername, validatePassword } = await import("../lib/validate");
-  const { validateWriting } = await import("../lib/validate-writing");
+  const { validateWriting, verbHintsFor } = await import("../lib/validate-writing");
   const { evaluateSentence } = await import("../lib/evaluate");
 
   function makeUser(opts: { grade?: string; start?: number; step?: number; coins?: number } = {}) {
@@ -360,11 +360,29 @@ const u = makeUser({});
   section("validateWriting");
   {
     eq(validateWriting("too short", { minWords: 8, requireWord: "short" }), "Your sentence needs at least 8 words — you have 2.", "short sentence rejected");
-    ok(validateWriting("I will conduct the orchestra tonight with great care.", { minWords: 8, requireWord: "conduct" }) === null, "8+ word sentence with word passes");
-    ok(validateWriting("She conducts herself very well in every single meeting.", { minWords: 8, requireWord: "conduct" }) === null, "inflected form counts");
-    ok(validateWriting("This is a totally different sentence without it.", { minWords: 8, requireWord: "conduct" }) !== null, "missing word rejected");
-    ok(validateWriting("x".repeat(40) + " conduct conduct conduct conduct conduct conduct", { minWords: 8, requireWord: "conduct" }) !== null, "gibberish rejected");
-    ok(validateWriting("conduct conduct conduct conduct conduct conduct conduct conduct conduct", { minWords: 8, requireWord: "conduct" }) !== null, "repetition spam rejected");
+    ok(validateWriting("I will conduct the orchestra tonight with great care.", { minWords: 8, requireWord: "conduct", verbHints: verbHintsFor("conduct", "noun / verb") }) === null, "8+ word sentence with word passes");
+    ok(validateWriting("She conducts herself very well in every single meeting.", { minWords: 8, requireWord: "conduct", verbHints: verbHintsFor("conduct", "noun / verb") }) === null, "inflected form counts");
+    ok(validateWriting("This is a totally different sentence without it.", { minWords: 8, requireWord: "conduct", verbHints: verbHintsFor("conduct", "noun / verb") }) !== null, "missing word rejected");
+    ok(validateWriting("x".repeat(40) + " conduct conduct conduct conduct conduct conduct", { minWords: 8, requireWord: "conduct", verbHints: verbHintsFor("conduct", "noun / verb") }) !== null, "gibberish rejected");
+    ok(validateWriting("conduct conduct conduct conduct conduct conduct conduct conduct conduct", { minWords: 8, requireWord: "conduct", verbHints: verbHintsFor("conduct", "noun / verb") }) !== null, "repetition spam rejected");
+  }
+
+  section("word-salad detection (real sentences only)");
+  {
+    const v = (s: string) => validateWriting(s, { minWords: 8, requireWord: "conduct", verbHints: verbHintsFor("conduct", "noun / verb") });
+    // the exact cheat the user reported: random words + the required word
+    const salad = v("apple table green chair window pencil conduct book quickly today");
+    ok(salad !== null && salad.includes("list of random words"), "random word list rejected with clear message");
+    ok(v("Apple table green chair window pencil conduct book quickly today.") !== null, "capitalized salad still rejected");
+    const runOn = v("The captain ran past very big green tall wooden ancient mysterious conduct barriers.");
+    ok(runOn !== null, "impossible run of describing words rejected");
+    ok(v("The captain will conduct his ship through the storm carefully.") === null, "real sentence passes");
+    ok(v("Her conduct at the party was completely unacceptable.") === null, "noun-use of the word with a linking verb passes");
+    ok(v("I had to conduct a survey for my science homework yesterday.") === null, "everyday real sentence passes");
+    // noun word: no verb hint means verbless nonsense is still bounced
+    const noun = validateWriting("The big happiness on the table near the window.", { minWords: 8, requireWord: "happiness" });
+    ok(noun !== null, "verbless noun-word sentence rejected when word is not a verb");
+    ok(validateWriting("Her happiness about the sunny weather was truly contagious.", { minWords: 8, requireWord: "happiness" }) === null, "real sentence around a noun word passes");
   }
 
   // ---------- tutorial ----------
@@ -388,6 +406,9 @@ const u = makeUser({});
     const good = evaluateSentence("The captain will conduct his ship through the storm carefully tonight.", info);
     ok(typeof good.passed === "boolean", "verdict shape");
     ok(good.score > 0, "original sentence scores above zero");
+    const salad = evaluateSentence("Apple table green chair window pencil conduct book quickly today.", info);
+    eq(salad.passed, false, "word salad fails the server scorer even when the word appears");
+    ok(salad.issues.some((i) => i.includes("real sentence")), "salad issue explains the problem");
   }
 
   // ---------- garden ----------

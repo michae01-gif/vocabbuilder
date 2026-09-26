@@ -1,4 +1,5 @@
 import { inflections } from "./evaluate";
+import { sentenceStructure, structureErrorMessage } from "./sentence-sense";
 
 export const PASTE_WARNINGS_LIMIT = 3;
 export const PASTE_PENALTY_COINS = 500;
@@ -29,7 +30,7 @@ function containsWord(text: string, word: string): boolean {
  */
 export function validateWriting(
   text: string,
-  opts: { minWords?: number; requireWord?: string; requireWords?: string[]; label?: string } = {}
+  opts: { minWords?: number; requireWord?: string; requireWords?: string[]; label?: string; verbHints?: string[] } = {}
 ): string | null {
   const minWords = opts.minWords ?? 8;
   const label = opts.label ?? "sentence";
@@ -74,5 +75,16 @@ export function validateWriting(
     return `That looks like repeated text — write your own ${label}.`;
   }
 
+  // Real-sentence structure: connecting words + a verb, not a word list
+  const structure = sentenceStructure(toks, opts.verbHints);
+  if (!structure.ok && structure.issue) {
+    return structureErrorMessage(structure.issue, label);
+  }
+
   return null;
+}
+
+/** Verb hint list for a lesson word — its inflections when the word can be a verb. */
+export function verbHintsFor(word: string, pos: string | undefined | null): string[] {
+  return pos && pos.toLowerCase().includes("verb") ? inflections(word) : [];
 }

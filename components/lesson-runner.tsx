@@ -4,7 +4,7 @@ import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import { completeWordBatch, completeQuickCheck } from "@/lib/actions";
 import type { LessonWord, QuickCheckItem } from "@/lib/reading";
-import { validateWriting } from "@/lib/validate-writing";
+import { validateWriting, verbHintsFor } from "@/lib/validate-writing";
 import SpeakButton from "./speak-button";
 import GuardedTextarea from "./guarded-textarea";
 import { usePasteGuard } from "./use-paste-guard";
@@ -105,6 +105,7 @@ export default function LessonRunner({
         minWords: 8,
         requireWord: w.word,
         label: "sentence",
+        verbHints: verbHintsFor(w.word, w.pos),
       });
     }
     setSentenceErrors(errors);
@@ -392,7 +393,9 @@ export default function LessonRunner({
           <h2 className="font-[var(--font-lora)] text-xl font-semibold">Use the words</h2>
           <p className="text-sm text-zinc-400">
             Write a sentence using each word — at least <span className="text-amber-200">8 words</span>,
-            in your own words (any form of the word counts). Pasting is blocked: three warnings costs{" "}
+            in your own words (any form of the word counts). It must be a{" "}
+            <span className="text-amber-200">real sentence</span> — random word lists get bounced.
+            Pasting is blocked: three warnings costs{" "}
             <span className="text-amber-200">500 🪙</span>.
           </p>
           {pasteGuard.banner}
